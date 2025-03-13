@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://mydomain.org/netexperiments/websecurity/</loc>
+         <lastmod>2025-03-13</lastmod>
+    </url>
+    <url>
+         <loc>https://mydomain.org/netexperiments/websecurity/labs/hackergram/</loc>
+         <lastmod>2025-03-13</lastmod>
+    </url>
+    <url>
+         <loc>https://mydomain.org/netexperiments/websecurity/labs/attacks/csrf/</loc>
+         <lastmod>2025-03-13</lastmod>
+    </url>
+    <url>
+         <loc>https://mydomain.org/netexperiments/websecurity/labs/attacks/css/</loc>
+         <lastmod>2025-03-13</lastmod>
+    </url>
+    <url>
+         <loc>https://mydomain.org/netexperiments/websecurity/labs/attacks/lab-setup/</loc>
+         <lastmod>2025-03-13</lastmod>
+    </url>
+    <url>
+         <loc>https://mydomain.org/netexperiments/websecurity/labs/attacks/user-enumeration/</loc>
+         <lastmod>2025-03-13</lastmod>
+    </url>
+</urlset>

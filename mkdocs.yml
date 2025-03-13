@@ -1,0 +1,26 @@
+site_name: Web security
+site_url: https://mydomain.org/netexperiments/websecurity
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - content.code.copy
+    - navigation.indexes
+    - navigation.expand
+    - navigation.tabs.sticky
+nav:
+  - Home: index.md
+  - Labs:
+    - Hackergram: labs/hackergram.md
+    - Attacks:
+      - Lab setup: labs/attacks/lab-setup.md
+      - Cross-Site Request Forgery: labs/attacks/csrf.md
+      - Cross-Site Scripting: labs/attacks/css.md
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences    
+  - attr_list
+  - md_in_html
+  - pymdownx.blocks.caption
