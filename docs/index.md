@@ -4,7 +4,8 @@ The aim of this laboratory work is to study the Web security.
 
 ## Labs
 
-* Attacks
+* Summary information about labs and attacks.
+* The site may include a primer on Web programming and Javascript
 
 ## Contributors
 

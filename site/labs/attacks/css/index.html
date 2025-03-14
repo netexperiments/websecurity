@@ -660,14 +660,14 @@
 <li>Install a Wireshark probe at the Hackergram interface.</li>
 <li>In the victim-browser enter:
 <code>http://192.168.0.100/users?search=&lt;script&gt;alert%28"XSS"%29&lt;%2Fscript&gt;</code>
-Note that %28 and %29 encode the “(” and “)” characters, and %2F encode the “/” character.</li>
+Note that <code>%28</code> and <code>%29</code> encode the <code>(</code> and <code>)</code> characters, and <code>%2F</code> encode the <code>/</code> character.</li>
 <li>Check that a pop-up box with the message XSS must be displayed.</li>
-<li>Analyze the traffic exchanged by Hackergram using an http filter. Identify the HTTP message that sends the JavaScript code to Hackergram and the one where it is reflected to the victim-browser.</li>
+<li>Analyze the traffic exchanged by Hackergram using an <code>http</code> filter. Identify the HTTP message that sends the JavaScript code to Hackergram and the one where it is reflected to the victim-browser.</li>
 </ol>
 <p>Additional exercises:</p>
 <ol>
 <li>Hackergram has another endpoint vulnerable to this attack. Discover it and perform the attack.</li>
-<li>Using the bleach library, sanitize the /users endpoint so that the attack is no longer possible.</li>
+<li>Using the bleach library, sanitize the <code>/users</code> endpoint so that the attack is no longer possible.</li>
 </ol>
 <h2 id="xss-worm">XSS worm</h2>
 <p>In this attack you will create an XSS worm using the posts feature, which leverages the DOM of the page. The following code makes the victim create a post with the content “Mallory hacked me”.</p>

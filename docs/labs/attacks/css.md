@@ -47,30 +47,32 @@ if __name__ == '__main__':
         exploit(s)
 ```
         
-The script first makes a request to the /reset endpoint to force a clean state on Hackergram and then registers and logs in the @mallory user. Lastly, it makes a request to the /create_post endpoint, creating a new post with the content: ```<script>alert("XSS")</script>```. This post is going to be stored in Hackergram’s database.
+The script first makes a request to the ```/reset``` endpoint to force a clean state on Hackergram and then registers and logs in the ```@mallory``` user. Lastly, it makes a request to the ```/create_post``` endpoint, creating a new post with the content: ```<script>alert("XSS")</script>```. This post is going to be stored in Hackergram’s database.
 
 2.	Install a Wireshark probe at the Hackergram interface.
 3.	Run the script at the attacker.
-4.	Login to Hackergram (e.g., as ```mr_robot```) and check that the victim-browser runs the JavaScript code when visiting either Mallory’s profile page or Hackergram’s homepage. In this case, a pop-up box with the message XSS must be displayed.
-5.	Analyze the traffic exchanged by Hackergram using an http filter. Identify the HTTP message that injects the JavaScript code in Hackergram and the one that transfers it to the victim-browser.
+4.	Login to Hackergram (e.g., as ```mr_robot```) and check that the victim-browser runs the JavaScript code when visiting either Mallory’s profile page or Hackergram’s homepage. In this case, a pop-up box with the message ```XSS``` must be displayed.
+5.	Analyze the traffic exchanged by Hackergram using an ```http``` filter. Identify the HTTP message that injects the JavaScript code in Hackergram and the one that transfers it to the victim-browser.
 
-Additional exercises: The /settings endpoint is also vulnerable to this attack type. Find a way of using the photo field to attack this endpoint.
+!!! note "Additional exercise"
+
+    The "/settings" endpoint is also vulnerable to this attack type. Find a way of using the photo field to attack this endpoint.
 
 ## Reflected XSS
 
-In this attack, the attacker tricks the victim into clicking a malicious link which results in a JavaScript code being executed in the victim-browser, hence the name reflected XSS. The vulnerable endpoint that will be exploited is /users, which allows searching for users by providing a search string. The string is passed to Hackergram as an argument (called search) of a GET Request. The procedure is the following:
+In this attack, the attacker tricks the victim into clicking a malicious link which results in a JavaScript code being executed in the victim-browser, hence the name reflected XSS. The vulnerable endpoint that will be exploited is ```/users```, which allows searching for users by providing a search string. The string is passed to Hackergram as an argument (called ```search```) of a GET Request. The procedure is the following:
 
 1.	Install a Wireshark probe at the Hackergram interface.
 2.	In the victim-browser enter:
 ```http://192.168.0.100/users?search=<script>alert%28"XSS"%29<%2Fscript>```
 Note that ```%28``` and ```%29``` encode the ```(``` and ```)``` characters, and ```%2F``` encode the ```/``` character.
-3.	Check that a pop-up box with the message XSS must be displayed.
+3.	Check that a pop-up box with the message ```XSS``` is displayed.
 4.	Analyze the traffic exchanged by Hackergram using an ```http``` filter. Identify the HTTP message that sends the JavaScript code to Hackergram and the one where it is reflected to the victim-browser.
 
-Additional exercises:
+!!! note "Addicional exercises"
 
-1.	Hackergram has another endpoint vulnerable to this attack. Discover it and perform the attack.
-2.	Using the bleach library, sanitize the ```/users``` endpoint so that the attack is no longer possible.
+    1. Hackergram has another endpoint vulnerable to this attack. Discover it and perform the attack.
+    2. Using the bleach library, sanitize the ```/users``` endpoint so that the attack is no longer possible.
 
 ##	XSS worm
 
@@ -141,7 +143,7 @@ if __name__ == '__main__':
 Do the following:
 
 1. Run the script on the attacker.
-2. Login as mr_robot and check that a post has been created on behalf of ```mr_robot``` with the content “Mallory hacked me”. Check that a new post is created when reloading Hackergram’s homepage or any other page that displays posts.
+2. Login as ```mr_robot``` and check that a post has been created on behalf of ```mr_robot``` with the content “Mallory hacked me”. Check that a new post is created when reloading Hackergram’s homepage or any other page that displays posts.
 3. Repeat the procedure for other users.
 
 Now, modify the script so that the attack turns into a true XSS worm, i.e., so that it achieves self-propagation.
