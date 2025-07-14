@@ -11,22 +11,23 @@
         <link rel="canonical" href="https://mydomain.org/netexperiments/websecurity/labs/hackergram/">
       
       
-        <link rel="prev" href="../..">
-      
       
         <link rel="next" href="../attacks/lab-setup/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.9">
     
     
       
-        <title>Hackergram - Web security</title>
+        <title>The Hackergram Web Application - Hackergram Lab</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.8608ea7d.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.4af4bdda.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -55,7 +56,12 @@
   </head>
   
   
-    <body dir="ltr">
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -64,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#hackergram" class="md-skip">
+        <a href="#the-hackergram-web-application" class="md-skip">
           Skip to content
         </a>
       
@@ -80,7 +86,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Web security" class="md-header__button md-logo" aria-label="Web security" data-md-component="logo">
+    <a href="../.." title="Hackergram Lab" class="md-header__button md-logo" aria-label="Hackergram Lab" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -94,21 +100,21 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            Web security
+            Hackergram Lab
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Hackergram
+              The Hackergram Web Application
             
           </span>
         </div>
       </div>
     </div>
     
+      
     
-      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
@@ -161,14 +167,16 @@
         
   
   
+    
   
-    <li class="md-tabs__item">
-      <a href="../.." class="md-tabs__link">
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
         
   
     
   
-  Home
+  The Hackergram Web Application
 
       </a>
     </li>
@@ -178,21 +186,54 @@
         
   
   
+  
+    <li class="md-tabs__item">
+      <a href="../attacks/lab-setup/" class="md-tabs__link">
+        
+  
     
   
+  Laboratory Setup
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+      
+  
+  
+  
+    
+    
+      
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../attacks/sqli/" class="md-tabs__link">
           
   
     
   
-  Labs
+  Practical Attacks and Mitigation
 
         </a>
       </li>
+    
+  
+
+    
+  
+
     
   
 
@@ -225,92 +266,19 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Web security" class="md-nav__button md-logo" aria-label="Web security" data-md-component="logo">
+    <a href="../.." title="Hackergram Lab" class="md-nav__button md-logo" aria-label="Hackergram Lab" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    Web security
+    Hackergram Lab
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
     
       
       
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Home
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-    
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-    
-    
-      
-        
-        
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
-            
-  
-  <span class="md-ellipsis">
-    Labs
-    
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            Labs
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
   
   
     
@@ -329,7 +297,7 @@
         
   
   <span class="md-ellipsis">
-    Hackergram
+    The Hackergram Web Application
     
   </span>
   
@@ -339,7 +307,123 @@
     </li>
   
 
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../attacks/lab-setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Laboratory Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Practical Attacks and Mitigation
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Practical Attacks and Mitigation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
               
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Web Security Attacks
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            Web Security Attacks
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
                 
@@ -354,33 +438,28 @@
       
         
       
-        
-      
     
     
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_2" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1_1" >
         
           
-          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3_1_1" id="__nav_3_1_1_label" tabindex="0">
             
   
   <span class="md-ellipsis">
-    Attacks
+    Injection attacks
     
   </span>
   
@@ -388,10 +467,10 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_1_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1_1">
             <span class="md-nav__icon md-icon"></span>
-            Attacks
+            Injection attacks
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -402,11 +481,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../attacks/lab-setup/" class="md-nav__link">
+      <a href="../attacks/sqli/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Lab setup
+    SQL Injection
     
   </span>
   
@@ -416,6 +495,194 @@
   
 
               
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1_1_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1_1_2" id="__nav_3_1_1_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Cross-Site Scripting
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_1_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            Cross-Site Scripting
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../attacks/stored-xss/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Stored XSS
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../attacks/reflected-xss/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Reflected XSS
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../attacks/xss-worm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    XSS Worm
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Request Forgery Attacks
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Request Forgery Attacks
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
                 
@@ -429,28 +696,6 @@
   
   <span class="md-ellipsis">
     Cross-Site Request Forgery
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../attacks/css/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Cross-Site Scripting
     
   </span>
   
@@ -510,7 +755,69 @@
 
 
 
-<h1 id="hackergram">Hackergram</h1>
+<h1 id="the-hackergram-web-application">The Hackergram Web application</h1>
+<p>Hackergram is an intentionally vulnerable Web application that was designed with the purpose of providing students and security enthusiasts with an environment where they can familiarize themselves with and gain practical experience in identifying, exploiting, and mitigating various types of Web vulnerabilities, mainly <a href="../attacks/csrf/">CSRF</a>, XSS (<a href="../attacks/stored-xss/">Stored</a>, <a href="../attacks/reflected-xss/">Reflected</a>, <a href="../attacks/xss-worm/">Worm</a>) and <a href="../attacks/sqli/">SQLi</a>. It consists of a simple social networking website. In Hackergram, users can create an account by registering their username, password, and name. Once registered, users can log into their account and start using its various features:</p>
+<ul>
+<li>Posts are the main feature of the website. Users can write posts that will then be shown to other users on the homepage.</li>
+<li>Posts can also be edited or deleted.</li>
+<li>Users can connect with each other by sending friendship requests, which can be accepted or declined.</li>
+<li>A user can also remove his/her friendship with another user at any time.</li>
+<li>Users can navigate to any user’s profile to see their information (i.e., name, username, picture, and bio), as well as their posts and friends.</li>
+<li>A user is allowed to change his/her own settings (i.e., name, password, picture, and bio).</li>
+<li>There is a search functionality that allows users to search for posts with a specific word or content and search for other users by username.</li>
+</ul>
+<p>The initial state of Hackergram already includes several users, posts, friendships, and friendship requests. Moreover, the application includes a special endpoint called /reset that allows to reset the application to its initial state at any moment. This is particularly useful since some attacks completely break the application and this offers the possibility of going back to a clean state whenever necessary.</p>
+<p>The following table lists all existing users in the Web application and their respective passwords. The user <code>mr_robot</code> is the one with the most user data on the application.</p>
+<table>
+<thead>
+<tr>
+<th>User</th>
+<th>Password</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>admin</td>
+<td>1_4m_Th3_4dm1n</td>
+</tr>
+<tr>
+<td>mr_robot</td>
+<td>elliot123</td>
+</tr>
+<tr>
+<td>dpr</td>
+<td>silk-road</td>
+</tr>
+<tr>
+<td>satoshi</td>
+<td>bitcoin2009</td>
+</tr>
+<tr>
+<td>heisenberg</td>
+<td>walter1958</td>
+</tr>
+<tr>
+<td>rick</td>
+<td>RickC-137</td>
+</tr>
+<tr>
+<td>stark</td>
+<td>winterfell</td>
+</tr>
+<tr>
+<td>anon1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>anon2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>anon3</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
 
 
 

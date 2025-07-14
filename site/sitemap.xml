@@ -2,26 +2,34 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://mydomain.org/netexperiments/websecurity/</loc>
-         <lastmod>2025-03-14</lastmod>
+         <lastmod>2025-07-10</lastmod>
     </url>
     <url>
          <loc>https://mydomain.org/netexperiments/websecurity/labs/hackergram/</loc>
-         <lastmod>2025-03-14</lastmod>
+         <lastmod>2025-07-10</lastmod>
     </url>
     <url>
          <loc>https://mydomain.org/netexperiments/websecurity/labs/attacks/csrf/</loc>
-         <lastmod>2025-03-14</lastmod>
-    </url>
-    <url>
-         <loc>https://mydomain.org/netexperiments/websecurity/labs/attacks/css/</loc>
-         <lastmod>2025-03-14</lastmod>
+         <lastmod>2025-07-10</lastmod>
     </url>
     <url>
          <loc>https://mydomain.org/netexperiments/websecurity/labs/attacks/lab-setup/</loc>
-         <lastmod>2025-03-14</lastmod>
+         <lastmod>2025-07-10</lastmod>
     </url>
     <url>
-         <loc>https://mydomain.org/netexperiments/websecurity/labs/attacks/user-enumeration/</loc>
-         <lastmod>2025-03-14</lastmod>
+         <loc>https://mydomain.org/netexperiments/websecurity/labs/attacks/reflected-xss/</loc>
+         <lastmod>2025-07-10</lastmod>
+    </url>
+    <url>
+         <loc>https://mydomain.org/netexperiments/websecurity/labs/attacks/sqli/</loc>
+         <lastmod>2025-07-10</lastmod>
+    </url>
+    <url>
+         <loc>https://mydomain.org/netexperiments/websecurity/labs/attacks/stored-xss/</loc>
+         <lastmod>2025-07-10</lastmod>
+    </url>
+    <url>
+         <loc>https://mydomain.org/netexperiments/websecurity/labs/attacks/xss-worm/</loc>
+         <lastmod>2025-07-10</lastmod>
     </url>
 </urlset>
