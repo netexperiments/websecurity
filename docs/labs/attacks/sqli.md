@@ -85,7 +85,7 @@ if __name__ == '__main__':
 ```
 </details>
 
-## 7.2 Authentication bypass
+## Authentication bypass
 
 Hackergram is vulnerable to authentication bypass attacks. In this exercise, login as admin without using its password.
 
@@ -107,7 +107,7 @@ The `--` comments out the password check, and `1=1` is always true.
 
 </details>
 
-## 7.3 Union-based SQLi
+## Union-based SQLi
 
 Use union-based injection to dump all users and passwords from the database.
 

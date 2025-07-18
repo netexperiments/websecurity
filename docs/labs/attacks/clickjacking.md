@@ -1,5 +1,6 @@
 # Clickjacking
 
+## Attack
 Create a post on behalf of a user without their knowledge by tricking them into clicking a disguised button embedded within a malicious site. This attack exploits the fact that Hackergram web application can be embedded inside an iframe. In this case, the `/create_posts` endpoint will be targeted.
 
 To execute the attack, follow these steps:
