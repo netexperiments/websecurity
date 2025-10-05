@@ -17,7 +17,6 @@ theme:
 nav:
   - The Hackergram Web Application: labs/hackergram.md
   - Laboratory Setup: labs/attacks/lab-setup.md
-  - "": ""
   - Practical Attacks and Mitigation:
     - Web Security Attacks:
       - Injection attacks:
@@ -28,21 +27,12 @@ nav:
           - Reflected XSS: labs/attacks/reflected-xss.md
           - XSS Worm: labs/attacks/xss-worm.md
           - XSS Countermeasure: labs/attacks/xss-countermeasure.md
-      - "": ""
-      - "": ""
-      - "": ""
       - Request Forgery Attacks:
         - Cross-Site Request Forgery: labs/attacks/csrf.md
         - Server Side Request Forgery: labs/attacks/ssrf.md
-      - "": ""
-      - "": ""
-      - "": ""
       - Access and Resource Exploitation:
         - Path traversal: labs/attacks/path-traversal.md
         - Clickjacking: labs/attacks/clickjacking.md
-      - "": ""
-      - "": ""
-      - "": ""
       - LLM Vulnerabilities in Web Contexts:
         - Prompt Injection: labs/attacks/prompt-injection.md
 markdown_extensions:
