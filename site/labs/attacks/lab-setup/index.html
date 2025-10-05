@@ -81,10 +81,6 @@
       
     </div>
     
-      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
-        
-      </div>
-    
     
       
 
@@ -357,9 +353,36 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lab-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Lab Environment
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#simple-hackergram" class="md-nav__link">
     <span class="md-ellipsis">
       Simple Hackergram
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gns3-lab-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      GNS3 Lab Configuration
     </span>
   </a>
   
@@ -1046,9 +1069,36 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lab-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Lab Environment
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#simple-hackergram" class="md-nav__link">
     <span class="md-ellipsis">
       Simple Hackergram
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gns3-lab-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      GNS3 Lab Configuration
     </span>
   </a>
   
@@ -1071,11 +1121,716 @@
 
 
 <h1 id="lab-setup">Lab setup</h1>
-<p>The lab experiments will be performed using GNS3 VM. The network scenario for the experiments is shown in the following Figure. Another alternative is to use it locally by installing the adequate docker containers and requirements.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>Before setting up the lab environment, if you want to use it via GNS3 ensure you have the following components installed and configured:</p>
+<ul>
+<li><strong>GNS3</strong>: The main network simulation platform must be installed on your host system</li>
+<li><strong>GNS3VM</strong>: The GNS3 Virtual Machine should be installed and configured on VMware (recommended virtualization platform for optimal performance and compatibility)</li>
+<li><strong>VMware</strong>: VMware Workstation (Windows/Linux) or VMware Fusion (macOS) is the recommended hypervisor for running GNS3VM</li>
+</ul>
+<h2 id="lab-environment">Lab Environment</h2>
+<p>The lab experiments will be explained using GNS3 VM. The network scenario for the experiments is shown in the following Figure. Another alternative is to use it locally by installing the adequate docker containers and requirements.</p>
 <p><img alt="Image title" src="../lab-setup.png" /></p>
 <p>The Hackergram Web application is implemented with a Docker container available at the Docker Hub. For the Hackergram, install at GNS3 the container <a href="https://hub.docker.com/r/0xdrogon/hackergram">0xdrogon/hackergram</a>. For the attacker, install at GNS3 the container <a href="https://hub.docker.com/r/0xdrogon/hackergram-attacker">0xdrogon/hackergram-attacker</a>. For the victim-browser use the webterm of GNS3.</p>
 <h2 id="simple-hackergram">Simple Hackergram</h2>
-<p>To facilitate the introduction of key concepts, a simplified version of the application, <strong>Simple Hackergram</strong>, has been developed. This version of the laboratory includes only a subset of the vulnerabilities and attack scenarios, and it requires fewer computational resources and dependencies. It is intended as a preparatory step before progressing to the full-featured Hackergram environment. TODO (inserir links para o laboratorio e correspondente guia).</p>
+<p>To facilitate the introduction of key concepts, a simplified version of the application, <strong>Simple Hackergram</strong>, has been developed. This version of the laboratory includes only a subset of the vulnerabilities and attack scenarios, and it requires fewer computational resources and dependencies. It is intended as a preparatory step before progressing to the full-featured Hackergram environment.</p>
+<h2 id="gns3-lab-configuration">GNS3 Lab Configuration</h2>
+<p>Before setting up the lab topology, you need to add the required Docker containers to GNS3:</p>
+<ol>
+<li><strong>Add the Hackergram Attacker container:</strong></li>
+<li>In GNS3, go to the settings/preferences</li>
+<li>Navigate to Docker containers section</li>
+<li>
+<p>Add the container: <code>0xdrogon/hackergram-attacker</code></p>
+</li>
+<li>
+<p><strong>Add the Hackergram application container:</strong></p>
+</li>
+<li>In the same Docker containers section</li>
+<li>Add the container: <code>pimz23/hackergram30</code> (available at https://hub.docker.com/repository/docker/pimz23/hackergram30)</li>
+</ol>
+<p>Once both containers are added to GNS3, you can proceed with creating the lab topology using these containers. </p>
+<p>Ensure that both GNS3 and the GNS3 VM are running, then execute the script <code>HackergramLabTopology.py</code> shown below. Replace the GNS3 VM password on line 8 with your own. You can usually find it in the <code>gns3_server.ini</code> file located at <code>C:\Users\YourUser\AppData\Roaming\GNS3\2.2\gns3_server.ini</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+
+<span class="c1"># GNS3 Server API Endpoint</span>
+<span class="n">GNS3_SERVER</span> <span class="o">=</span> <span class="s2">&quot;http://localhost:3080/v2&quot;</span>
+<span class="n">USERNAME</span> <span class="o">=</span> <span class="s2">&quot;admin&quot;</span>
+<span class="n">PASSWORD</span> <span class="o">=</span> <span class="s2">&quot;uhl128OLIQi8gI4BpJC9vsb2sHOXejqsUKsJrVO9nifTXJbB5WmPh5qoTGtqtLUo&quot;</span>
+<span class="n">TEMPLATES</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="c1"># GNS3 Authentication</span>
+<span class="n">auth</span> <span class="o">=</span> <span class="p">(</span><span class="n">USERNAME</span><span class="p">,</span> <span class="n">PASSWORD</span><span class="p">)</span>
+
+<span class="c1"># Project and container settings</span>
+<span class="n">PROJECT_NAME</span> <span class="o">=</span> <span class="s2">&quot;gns3_hackergram_lab&quot;</span>
+<span class="n">DOCKER_IMAGE</span> <span class="o">=</span> <span class="s2">&quot;pimz23/hackergram2.3:latest&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_project_id</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if a project with the given name exists and return its ID.&quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GNS3_SERVER</span><span class="si">}</span><span class="s2">/projects&quot;</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">auth</span><span class="p">)</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+
+    <span class="n">projects</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">project</span> <span class="ow">in</span> <span class="n">projects</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">project</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">PROJECT_NAME</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">project</span><span class="p">[</span><span class="s2">&quot;project_id&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">delete_project</span><span class="p">(</span><span class="n">project_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Delete an existing project by ID.&quot;&quot;&quot;</span>
+    <span class="n">requests</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GNS3_SERVER</span><span class="si">}</span><span class="s2">/projects/</span><span class="si">{</span><span class="n">project_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">auth</span><span class="p">)</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Deleted existing project: </span><span class="si">{</span><span class="n">PROJECT_NAME</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_project</span><span class="p">(</span><span class="n">custom_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a new GNS3 project&quot;&quot;&quot;</span>
+    <span class="n">project_name</span> <span class="o">=</span> <span class="n">custom_name</span> <span class="k">if</span> <span class="n">custom_name</span> <span class="k">else</span> <span class="n">PROJECT_NAME</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GNS3_SERVER</span><span class="si">}</span><span class="s2">/projects&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">project_name</span><span class="p">},</span> <span class="n">auth</span><span class="o">=</span><span class="n">auth</span><span class="p">)</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+    <span class="n">project_data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Project UUID: </span><span class="si">{</span><span class="n">project_data</span><span class="p">[</span><span class="s1">&#39;project_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">project_data</span><span class="p">[</span><span class="s2">&quot;project_id&quot;</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">add_switch</span><span class="p">(</span><span class="n">project_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add an Ethernet switch&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Adding Ethernet switch...&quot;</span><span class="p">)</span>
+    <span class="n">switch_config</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Lab_Switch&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;node_type&quot;</span><span class="p">:</span> <span class="s2">&quot;ethernet_switch&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;compute_id&quot;</span><span class="p">:</span> <span class="s2">&quot;vm&quot;</span><span class="p">,</span>  
+        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="p">}</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GNS3_SERVER</span><span class="si">}</span><span class="s2">/projects/</span><span class="si">{</span><span class="n">project_id</span><span class="si">}</span><span class="s2">/nodes&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">switch_config</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">auth</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">201</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ERROR: Failed to create switch. Status: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="n">switch_id</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;node_id&quot;</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully created switch with ID: </span><span class="si">{</span><span class="n">switch_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">switch_id</span>
+
+    <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to add switch: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;response&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Status code: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response content: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_docker_image</span><span class="p">(</span><span class="n">template_id</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">TEMPLATES</span>
+    <span class="k">for</span> <span class="n">template</span> <span class="ow">in</span> <span class="n">TEMPLATES</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">template</span><span class="p">[</span><span class="s2">&quot;template_id&quot;</span><span class="p">]</span><span class="o">==</span><span class="n">template_id</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">template</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Template </span><span class="si">{</span><span class="n">template_id</span><span class="si">}</span><span class="s2"> docker image not found&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_templates</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">TEMPLATES</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">templates</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GNS3_SERVER</span><span class="si">}</span><span class="s2">/templates&quot;</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">auth</span><span class="p">)</span>
+        <span class="n">templates</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="n">TEMPLATES</span> <span class="o">=</span> <span class="n">templates</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Retrieved </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">TEMPLATES</span><span class="p">)</span><span class="si">}</span><span class="s2"> templates&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">TEMPLATES</span>
+    <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error retrieving templates: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">TEMPLATES</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_template_id</span><span class="p">(</span><span class="n">template_name</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">TEMPLATES</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">TEMPLATES</span><span class="p">:</span>
+        <span class="n">get_templates</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">template</span> <span class="ow">in</span> <span class="n">TEMPLATES</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">template_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">template</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found template: </span><span class="si">{</span><span class="n">template</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> (ID: </span><span class="si">{</span><span class="n">template</span><span class="p">[</span><span class="s1">&#39;template_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">template</span><span class="p">[</span><span class="s2">&quot;template_id&quot;</span><span class="p">]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Template &#39;</span><span class="si">{</span><span class="n">template_name</span><span class="si">}</span><span class="s2">&#39; not found. Available templates:&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">template</span> <span class="ow">in</span> <span class="n">TEMPLATES</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">template</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">add_docker_container</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">container_name</span><span class="p">,</span> <span class="n">template_id</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a Docker container using the specified template&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Adding container &#39;</span><span class="si">{</span><span class="n">container_name</span><span class="si">}</span><span class="s2">&#39; with template ID: </span><span class="si">{</span><span class="n">template_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Check if template_id is valid</span>
+        <span class="k">if</span> <span class="n">template_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ERROR: Template ID is None for container &#39;</span><span class="si">{</span><span class="n">container_name</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="c1"># Step 1: Create node from template</span>
+        <span class="n">node_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">container_name</span><span class="p">}</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GNS3_SERVER</span><span class="si">}</span><span class="s2">/projects/</span><span class="si">{</span><span class="n">project_id</span><span class="si">}</span><span class="s2">/templates/</span><span class="si">{</span><span class="n">template_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> 
+                               <span class="n">json</span><span class="o">=</span><span class="n">node_data</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">auth</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">201</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ERROR: Failed to create node from template. Status: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="n">node_id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;node_id&quot;</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully created node with ID: </span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">node_id</span>
+
+    <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to add container &#39;</span><span class="si">{</span><span class="n">container_name</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;response&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Status code: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response content: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected error adding container &#39;</span><span class="si">{</span><span class="n">container_name</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">start_node</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Start a GNS3 node&quot;&quot;&quot;</span>
+    <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GNS3_SERVER</span><span class="si">}</span><span class="s2">/projects/</span><span class="si">{</span><span class="n">project_id</span><span class="si">}</span><span class="s2">/nodes/</span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="s2">/start&quot;</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">auth</span><span class="p">)</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">list_all_templates</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GNS3_SERVER</span><span class="si">}</span><span class="s2">/templates&quot;</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">auth</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="n">templates</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Installed Templates:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">template</span> <span class="ow">in</span> <span class="n">templates</span><span class="p">:</span>
+            <span class="n">template_type</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;template_type&#39;</span><span class="p">,</span> <span class="s1">&#39;unknown&#39;</span><span class="p">)</span>
+            <span class="n">compute_id</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;compute_id&#39;</span><span class="p">,</span> <span class="s1">&#39;unknown&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Name: </span><span class="si">{</span><span class="n">template</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> (ID: </span><span class="si">{</span><span class="n">template</span><span class="p">[</span><span class="s1">&#39;template_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">) [Type: </span><span class="si">{</span><span class="n">template_type</span><span class="si">}</span><span class="s2">, Compute: </span><span class="si">{</span><span class="n">compute_id</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Total Templates: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">templates</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">templates</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error retrieving templates: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">debug_template_details</span><span class="p">(</span><span class="n">template_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get detailed information about a specific template&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GNS3_SERVER</span><span class="si">}</span><span class="s2">/templates/</span><span class="si">{</span><span class="n">template_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">auth</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Template Details for </span><span class="si">{</span><span class="n">template_id</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">template</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">template</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error getting template details: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">list_compute_engines</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List available compute engines&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GNS3_SERVER</span><span class="si">}</span><span class="s2">/computes&quot;</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">auth</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="n">computes</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Available Compute Engines:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">compute</span> <span class="ow">in</span> <span class="n">computes</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- ID: </span><span class="si">{</span><span class="n">compute</span><span class="p">[</span><span class="s1">&#39;compute_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, Name: </span><span class="si">{</span><span class="n">compute</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, Connected: </span><span class="si">{</span><span class="n">compute</span><span class="p">[</span><span class="s1">&#39;connected&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">computes</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error getting compute engines: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">add_note</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#000000&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a text note/label to the topology at specified coordinates&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Adding note &#39;</span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">&#39; at position (</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create SVG text element - GNS3 expects SVG format</span>
+        <span class="n">svg_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;svg height=&quot;</span><span class="si">{</span><span class="n">font_size</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">5</span><span class="si">}</span><span class="s1">&quot; width=&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">font_size</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="mi">2</span><span class="si">}</span><span class="s1">&quot;&gt;&lt;text x=&quot;0&quot; y=&quot;</span><span class="si">{</span><span class="n">font_size</span><span class="si">}</span><span class="s1">&quot; fill=&quot;</span><span class="si">{</span><span class="n">color</span><span class="si">}</span><span class="s1">&quot; font-size=&quot;</span><span class="si">{</span><span class="n">font_size</span><span class="si">}</span><span class="s1">&quot; font-family=&quot;Arial&quot;&gt;</span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s1">&lt;/text&gt;&lt;/svg&gt;&#39;</span>
+
+        <span class="n">note_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>
+            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span>
+            <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>  <span class="c1"># Layer (higher z values appear on top)</span>
+            <span class="s2">&quot;rotation&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;svg&quot;</span><span class="p">:</span> <span class="n">svg_content</span>
+        <span class="p">}</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GNS3_SERVER</span><span class="si">}</span><span class="s2">/projects/</span><span class="si">{</span><span class="n">project_id</span><span class="si">}</span><span class="s2">/drawings&quot;</span><span class="p">,</span> 
+                               <span class="n">json</span><span class="o">=</span><span class="n">note_data</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">auth</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">201</span><span class="p">:</span>
+            <span class="n">drawing_id</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;drawing_id&quot;</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully added note with ID: </span><span class="si">{</span><span class="n">drawing_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">drawing_id</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to add note. Status: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error adding note: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">add_multiple_notes</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">notes_list</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add multiple notes to the topology</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        project_id: GNS3 project ID</span>
+<span class="sd">        notes_list: List of dictionaries with note parameters</span>
+<span class="sd">                   [{&quot;text&quot;: &quot;Note text&quot;, &quot;x&quot;: 0, &quot;y&quot;: 0, &quot;font_size&quot;: 12, &quot;color&quot;: &quot;#000000&quot;}, ...]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">note_ids</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">note</span> <span class="ow">in</span> <span class="n">notes_list</span><span class="p">:</span>
+        <span class="n">note_id</span> <span class="o">=</span> <span class="n">add_note</span><span class="p">(</span>
+            <span class="n">project_id</span><span class="p">,</span> 
+            <span class="n">note</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span> 
+            <span class="n">note</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> 
+            <span class="n">note</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">note</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;font_size&quot;</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
+            <span class="n">note</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="s2">&quot;#000000&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">note_id</span><span class="p">:</span>
+            <span class="n">note_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">note_id</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">note_ids</span><span class="p">)</span><span class="si">}</span><span class="s2"> notes to the topology&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">note_ids</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_webterm_template</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a webterm template using a common webterm Docker image&quot;&quot;&quot;</span>
+    <span class="c1"># First, check what compute engines are available and find the best one</span>
+    <span class="n">computes</span> <span class="o">=</span> <span class="n">list_compute_engines</span><span class="p">()</span>
+
+    <span class="c1"># Prefer &#39;vm&#39; compute if available (for consistency with other containers), otherwise use &#39;local&#39;</span>
+    <span class="n">compute_id</span> <span class="o">=</span> <span class="s2">&quot;local&quot;</span>  <span class="c1"># default</span>
+    <span class="k">for</span> <span class="n">compute</span> <span class="ow">in</span> <span class="n">computes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">compute</span><span class="p">[</span><span class="s1">&#39;compute_id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;vm&#39;</span> <span class="ow">and</span> <span class="n">compute</span><span class="p">[</span><span class="s1">&#39;connected&#39;</span><span class="p">]:</span>
+            <span class="n">compute_id</span> <span class="o">=</span> <span class="s2">&quot;vm&quot;</span>
+            <span class="k">break</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using compute engine: </span><span class="si">{</span><span class="n">compute_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Try different webterm images in order of preference</span>
+    <span class="n">webterm_images</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;gns3/webterm:latest&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">webterm_images</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Trying to create WebTerm template with image: </span><span class="si">{</span><span class="n">image</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Adjust console settings based on image</span>
+            <span class="k">if</span> <span class="s2">&quot;ubuntu&quot;</span> <span class="ow">in</span> <span class="n">image</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="n">console_type</span> <span class="o">=</span> <span class="s2">&quot;telnet&quot;</span>
+                <span class="n">console_http_port</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">console_http_path</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">console_type</span> <span class="o">=</span> <span class="s2">&quot;http&quot;</span>
+                <span class="n">console_http_port</span> <span class="o">=</span> <span class="mi">3000</span> 
+                <span class="n">console_http_path</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span>
+
+            <span class="n">template_data</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;webterm&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;template_type&quot;</span><span class="p">:</span> <span class="s2">&quot;docker&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;compute_id&quot;</span><span class="p">:</span> <span class="n">compute_id</span><span class="p">,</span>
+                <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="n">image</span><span class="p">,</span>
+                <span class="s2">&quot;console_type&quot;</span><span class="p">:</span> <span class="n">console_type</span><span class="p">,</span>
+                <span class="s2">&quot;adapters&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s2">&quot;start_command&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;environment&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;extra_hosts&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;extra_volumes&quot;</span><span class="p">:</span> <span class="p">[]</span>
+            <span class="p">}</span>
+
+            <span class="c1"># Add HTTP console settings only for web terminals</span>
+            <span class="k">if</span> <span class="n">console_type</span> <span class="o">==</span> <span class="s2">&quot;http&quot;</span><span class="p">:</span>
+                <span class="n">template_data</span><span class="p">[</span><span class="s2">&quot;console_http_port&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">console_http_port</span>
+                <span class="n">template_data</span><span class="p">[</span><span class="s2">&quot;console_http_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">console_http_path</span>
+
+            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GNS3_SERVER</span><span class="si">}</span><span class="s2">/templates&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">template_data</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">auth</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">201</span><span class="p">:</span>
+                <span class="n">template_id</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;template_id&quot;</span><span class="p">]</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully created WebTerm template with ID: </span><span class="si">{</span><span class="n">template_id</span><span class="si">}</span><span class="s2"> using image: </span><span class="si">{</span><span class="n">image</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">template_id</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed with image </span><span class="si">{</span><span class="n">image</span><span class="si">}</span><span class="s2">. Status: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">continue</span> 
+
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error with image </span><span class="si">{</span><span class="n">image</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>  <span class="c1"># Try next image</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Failed to create WebTerm template with any available image&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">connect_nodes</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">node1_id</span><span class="p">,</span> <span class="n">node1_port</span><span class="p">,</span> <span class="n">node2_id</span><span class="p">,</span> <span class="n">node2_port</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Connect two nodes directly&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">connection_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;nodes&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;adapter_number&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="s2">&quot;node_id&quot;</span><span class="p">:</span> <span class="n">node1_id</span><span class="p">,</span> 
+                    <span class="s2">&quot;port_number&quot;</span><span class="p">:</span> <span class="n">node1_port</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;adapter_number&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="s2">&quot;node_id&quot;</span><span class="p">:</span> <span class="n">node2_id</span><span class="p">,</span> 
+                    <span class="s2">&quot;port_number&quot;</span><span class="p">:</span> <span class="n">node2_port</span>
+                <span class="p">}</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GNS3_SERVER</span><span class="si">}</span><span class="s2">/projects/</span><span class="si">{</span><span class="n">project_id</span><span class="si">}</span><span class="s2">/links&quot;</span><span class="p">,</span> 
+            <span class="n">json</span><span class="o">=</span><span class="n">connection_data</span><span class="p">,</span> 
+            <span class="n">auth</span><span class="o">=</span><span class="n">auth</span>
+        <span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connected node </span><span class="si">{</span><span class="n">node1_id</span><span class="si">}</span><span class="s2"> to node </span><span class="si">{</span><span class="n">node2_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to connect nodes: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s1">&#39;response&#39;</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response content: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">start_node</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Start a GNS3 node&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GNS3_SERVER</span><span class="si">}</span><span class="s2">/projects/</span><span class="si">{</span><span class="n">project_id</span><span class="si">}</span><span class="s2">/nodes/</span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="s2">/start&quot;</span><span class="p">,</span> 
+            <span class="n">auth</span><span class="o">=</span><span class="n">auth</span>
+        <span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Started node </span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to start node </span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_startup_script_for_containers</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create startup scripts that will configure IPs when containers boot&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating container startup IP configuration...&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create a script that can be executed inside containers</span>
+        <span class="n">startup_script</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;#!/bin/bash</span>
+<span class="s1"># Container IP Configuration Script</span>
+
+<span class="s1">echo &quot;Configuring container network...&quot;</span>
+
+<span class="s1"> # Function to configure IP for current container</span>
+<span class="s1">configure_ip() {</span>
+<span class="s1">    local ip_address=$1</span>
+<span class="s1">    echo &quot;Setting IP address to $ip_address&quot;</span>
+
+<span class="s1">    # Remove any existing IP configuration</span>
+<span class="s1">    ip addr flush dev eth0 2&gt;/dev/null || true</span>
+
+<span class="s1">    # Configure new IP address</span>
+<span class="s1">    ip addr add $ip_address/24 dev eth0</span>
+<span class="s1">    ip link set eth0 up</span>
+
+<span class="s1">    echo &quot;IP configuration complete: $ip_address&quot;</span>
+<span class="s1">}</span>
+
+<span class="s1"># Check hostname or container name to determine IP</span>
+<span class="s1">HOSTNAME=$(hostname)</span>
+<span class="s1">case &quot;$HOSTNAME&quot; in</span>
+<span class="s1">    *hackergram*|*Hackergram*)</span>
+<span class="s1">        configure_ip &quot;192.168.0.10&quot;</span>
+<span class="s1">        ;;</span>
+<span class="s1">    *attacker*|*Attacker*)</span>
+<span class="s1">        configure_ip &quot;192.168.0.100&quot;</span>
+<span class="s1">        ;;</span>
+<span class="s1">    *zap*|*ZAP*|*novnc*)</span>
+<span class="s1">        configure_ip &quot;192.168.0.20&quot;</span>
+<span class="s1">        ;;</span>
+<span class="s1">    *webterm*|*WebTerm*)</span>
+<span class="s1">        configure_ip &quot;192.168.0.50&quot;</span>
+<span class="s1">        ;;</span>
+<span class="s1">    *)</span>
+<span class="s1">        echo &quot;Unknown container type: $HOSTNAME&quot;</span>
+<span class="s1">        echo &quot;Please configure IP manually&quot;</span>
+<span class="s1">        ;;</span>
+<span class="s1">esac</span>
+<span class="s1">&#39;&#39;&#39;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;container_ip_config.sh&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">startup_script</span><span class="p">)</span>
+
+        <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="s2">&quot;container_ip_config.sh&quot;</span><span class="p">,</span> <span class="mo">0o755</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Created container_ip_config.sh script&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create startup script: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_container_docker_info</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get Docker container information for direct configuration&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Get node information from GNS3</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GNS3_SERVER</span><span class="si">}</span><span class="s2">/projects/</span><span class="si">{</span><span class="n">project_id</span><span class="si">}</span><span class="s2">/nodes/</span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">auth</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="n">node_info</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="n">container_id</span> <span class="o">=</span> <span class="n">node_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;properties&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;container_id&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">container_id</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to get container info: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">configure_container_network</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">container_name</span><span class="p">,</span> <span class="n">ip_address</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configure network settings for a Docker container&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Attempting to configure </span><span class="si">{</span><span class="n">container_name</span><span class="si">}</span><span class="s2"> with IP </span><span class="si">{</span><span class="n">ip_address</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Get container ID</span>
+        <span class="n">container_id</span> <span class="o">=</span> <span class="n">get_container_docker_info</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">container_id</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found container ID: </span><span class="si">{</span><span class="n">container_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;To manually configure this container, run:&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  docker exec </span><span class="si">{</span><span class="n">container_id</span><span class="si">}</span><span class="s2"> ip addr add </span><span class="si">{</span><span class="n">ip_address</span><span class="si">}</span><span class="s2">/24 dev eth0&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  docker exec </span><span class="si">{</span><span class="n">container_id</span><span class="si">}</span><span class="s2"> ip link set eth0 up&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not retrieve container ID for </span><span class="si">{</span><span class="n">container_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Since GNS3 API doesn&#39;t support direct IP configuration,</span>
+        <span class="c1"># we&#39;ll provide instructions for manual configuration</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Note: Automatic IP configuration via GNS3 API is not supported.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Use the GNS3 GUI to configure </span><span class="si">{</span><span class="n">container_name</span><span class="si">}</span><span class="s2"> manually:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  1. Right-click </span><span class="si">{</span><span class="n">container_name</span><span class="si">}</span><span class="s2"> → Edit config&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  2. Set static IP: </span><span class="si">{</span><span class="n">ip_address</span><span class="si">}</span><span class="s2">/24&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  3. Netmask: 255.255.255.0 (no gateway needed)&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  4. Save and restart container&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error with </span><span class="si">{</span><span class="n">container_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">set_node_ip</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">ip_cidr</span><span class="p">,</span> <span class="n">ifname</span><span class="o">=</span><span class="s2">&quot;eth0&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configure IP address by sending commands to the container console&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Configuring IP </span><span class="si">{</span><span class="n">ip_cidr</span><span class="si">}</span><span class="s2"> for node </span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Commands to configure IP address</span>
+        <span class="n">commands</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="sa">f</span><span class="s2">&quot;ip link set </span><span class="si">{</span><span class="n">ifname</span><span class="si">}</span><span class="s2"> up&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;ip addr flush dev </span><span class="si">{</span><span class="n">ifname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;ip addr add </span><span class="si">{</span><span class="n">ip_cidr</span><span class="si">}</span><span class="s2"> dev </span><span class="si">{</span><span class="n">ifname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Send each command to the node&#39;s console</span>
+        <span class="k">for</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="n">commands</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Send command via console</span>
+                <span class="n">console_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="n">cmd</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">}</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GNS3_SERVER</span><span class="si">}</span><span class="s2">/projects/</span><span class="si">{</span><span class="n">project_id</span><span class="si">}</span><span class="s2">/nodes/</span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="s2">/console/send&quot;</span><span class="p">,</span>
+                    <span class="n">json</span><span class="o">=</span><span class="n">console_data</span><span class="p">,</span>
+                    <span class="n">auth</span><span class="o">=</span><span class="n">auth</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ✓ Executed: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ✗ Failed: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2"> (Status: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ✗ Error executing </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;IP configuration completed for </span><span class="si">{</span><span class="n">ip_cidr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to configure IP for node </span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">existing_project_id</span> <span class="o">=</span> <span class="n">get_project_id</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">existing_project_id</span><span class="p">:</span>
+        <span class="n">delete_project</span><span class="p">(</span><span class="n">existing_project_id</span><span class="p">)</span>
+
+    <span class="n">project_id</span> <span class="o">=</span> <span class="n">create_project</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created project: </span><span class="si">{</span><span class="n">PROJECT_NAME</span><span class="si">}</span><span class="s2"> (ID: </span><span class="si">{</span><span class="n">project_id</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+    <span class="n">get_templates</span><span class="p">()</span>
+
+    <span class="c1"># Show all available templates with details</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== All Available Templates ===&quot;</span><span class="p">)</span>
+    <span class="n">list_all_templates</span><span class="p">()</span>
+
+    <span class="n">switch_id</span> <span class="o">=</span> <span class="n">add_switch</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added Ethernet switch: </span><span class="si">{</span><span class="n">switch_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Retrieve template IDs</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Retrieving Template IDs ===&quot;</span><span class="p">)</span>
+    <span class="n">hackergram_template_id</span> <span class="o">=</span> <span class="n">get_template_id</span><span class="p">(</span><span class="s2">&quot;pimz23-hackergram30&quot;</span><span class="p">)</span>  
+    <span class="n">attacker_template_id</span> <span class="o">=</span> <span class="n">get_template_id</span><span class="p">(</span><span class="s2">&quot;pimz23-my-gns3-attacker-2&quot;</span><span class="p">)</span>
+    <span class="n">zap_template_id</span> <span class="o">=</span> <span class="n">get_template_id</span><span class="p">(</span><span class="s2">&quot;pimz23-zap-desktop-novnc&quot;</span><span class="p">)</span>
+    <span class="n">webterm_template_id</span> <span class="o">=</span> <span class="p">(</span><span class="n">get_template_id</span><span class="p">(</span><span class="s2">&quot;webterm&quot;</span><span class="p">)</span> <span class="ow">or</span> 
+                          <span class="n">get_template_id</span><span class="p">(</span><span class="s2">&quot;Webterm&quot;</span><span class="p">)</span> <span class="ow">or</span> 
+                          <span class="n">get_template_id</span><span class="p">(</span><span class="s2">&quot;Web Terminal&quot;</span><span class="p">)</span> <span class="ow">or</span>
+                          <span class="n">get_template_id</span><span class="p">(</span><span class="s2">&quot;WebTerm&quot;</span><span class="p">))</span>
+
+    <span class="c1"># Log which templates were found</span>
+    <span class="k">if</span> <span class="n">zap_template_id</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Found ZAP Desktop template: </span><span class="si">{</span><span class="n">zap_template_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✗ ZAP Desktop template not found - will skip ZAP container&quot;</span><span class="p">)</span>
+
+    <span class="c1"># If no webterm template found, try to create one</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">webterm_template_id</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No WebTerm template found, attempting to create one...&quot;</span><span class="p">)</span>
+        <span class="n">webterm_template_id</span> <span class="o">=</span> <span class="n">create_webterm_template</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">webterm_template_id</span><span class="p">:</span>
+            <span class="c1"># Refresh templates after creation</span>
+            <span class="n">get_templates</span><span class="p">()</span>
+
+    <span class="c1"># Add containers using correct template IDs</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Adding Docker Containers ===&quot;</span><span class="p">)</span>
+    <span class="n">hackergram_node_id</span> <span class="o">=</span> <span class="n">add_docker_container</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="s2">&quot;Hackergram&quot;</span><span class="p">,</span> <span class="n">hackergram_template_id</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="n">get_docker_image</span><span class="p">(</span><span class="n">hackergram_template_id</span><span class="p">),</span> <span class="n">x</span><span class="o">=-</span><span class="mi">400</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">attacker_node_id</span> <span class="o">=</span> <span class="n">add_docker_container</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="s2">&quot;Attacker&quot;</span><span class="p">,</span> <span class="n">attacker_template_id</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="n">get_docker_image</span><span class="p">(</span><span class="n">attacker_template_id</span><span class="p">),</span> <span class="n">x</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+
+    <span class="c1"># Add ZAP container if template is available</span>
+    <span class="k">if</span> <span class="n">zap_template_id</span><span class="p">:</span>
+        <span class="n">zap_node_id</span> <span class="o">=</span> <span class="n">add_docker_container</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="s2">&quot;ZAP-Desktop&quot;</span><span class="p">,</span> <span class="n">zap_template_id</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="n">get_docker_image</span><span class="p">(</span><span class="n">zap_template_id</span><span class="p">),</span> <span class="n">x</span><span class="o">=-</span><span class="mi">400</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added ZAP Desktop with ID: </span><span class="si">{</span><span class="n">zap_node_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">zap_node_id</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ZAP Desktop template not found, skipping ZAP creation&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Add webterm if template is available</span>
+    <span class="k">if</span> <span class="n">webterm_template_id</span><span class="p">:</span>
+        <span class="n">webterm_node_id</span> <span class="o">=</span> <span class="n">add_docker_container</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="s2">&quot;WebTerm&quot;</span><span class="p">,</span> <span class="n">webterm_template_id</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added WebTerm with ID: </span><span class="si">{</span><span class="n">webterm_node_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">webterm_node_id</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WebTerm template not found, skipping WebTerm creation&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Connect containers to the switch</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Connecting Nodes ===&quot;</span><span class="p">)</span>
+    <span class="n">port_counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="n">hackergram_node_id</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">connect_nodes</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">switch_id</span><span class="p">,</span> <span class="n">port_counter</span><span class="p">,</span> <span class="n">hackergram_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">port_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Skipping Hackergram connection (container creation failed)&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">attacker_node_id</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">connect_nodes</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">switch_id</span><span class="p">,</span> <span class="n">port_counter</span><span class="p">,</span> <span class="n">attacker_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">port_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Skipping Attacker connection (container creation failed)&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">zap_node_id</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">connect_nodes</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">switch_id</span><span class="p">,</span> <span class="n">port_counter</span><span class="p">,</span> <span class="n">zap_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">port_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Connected ZAP Desktop to switch&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Skipping ZAP Desktop connection (container creation failed)&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">webterm_node_id</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">connect_nodes</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">switch_id</span><span class="p">,</span> <span class="n">port_counter</span><span class="p">,</span> <span class="n">webterm_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">port_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Connected WebTerm to switch&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Skipping WebTerm connection (container creation failed)&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Start all nodes</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Starting Nodes ===&quot;</span><span class="p">)</span>
+    <span class="n">start_node</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">switch_id</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">hackergram_node_id</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+    <span class="n">start_node</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">hackergram_node_id</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Skipping Hackergram startup (container creation failed)&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">attacker_node_id</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+    <span class="n">start_node</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">attacker_node_id</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Skipping Attacker startup (container creation failed)&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">zap_node_id</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">start_node</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">zap_node_id</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Started ZAP Desktop&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Skipping ZAP Desktop startup (container creation failed)&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">webterm_node_id</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">start_node</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">webterm_node_id</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Started WebTerm&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Skipping WebTerm startup (container creation failed)&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All nodes started and connected.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Wait for containers to fully initialize before configuring IPs</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Waiting for containers to fully initialize ===&quot;</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+
+    <span class="c1"># Create IP configuration script and provide instructions</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Creating IP Configuration Resources ===&quot;</span><span class="p">)</span>
+    <span class="n">create_startup_script_for_containers</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Container Information for Manual IP Configuration ===&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">hackergram_node_id</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">set_node_ip</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">hackergram_node_id</span><span class="p">,</span> <span class="s2">&quot;192.168.0.100/24&quot;</span><span class="p">)</span> 
+    <span class="k">if</span> <span class="n">attacker_node_id</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">set_node_ip</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">attacker_node_id</span><span class="p">,</span> <span class="s2">&quot;192.168.0.10/24&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">zap_node_id</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">set_node_ip</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">zap_node_id</span><span class="p">,</span> <span class="s2">&quot;192.168.0.20/24&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">webterm_node_id</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">set_node_ip</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">webterm_node_id</span><span class="p">,</span> <span class="s2">&quot;192.168.0.50/24&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Add IP address notes to the topology</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Adding IP Address Notes ===&quot;</span><span class="p">)</span>
+    <span class="n">add_note</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="s2">&quot;192.168.0.10&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">400</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#006600&quot;</span><span class="p">)</span> 
+    <span class="n">add_note</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="s2">&quot;192.168.0.100&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#CC0000&quot;</span><span class="p">)</span> 
+    <span class="n">add_note</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="s2">&quot;192.168.0.20&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">400</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">480</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#CC6600&quot;</span><span class="p">)</span>  
+    <span class="n">add_note</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="s2">&quot;192.168.0.50&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">480</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#666666&quot;</span><span class="p">)</span>   
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== IP Configuration Complete ===&quot;</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🎉 LAB SETUP COMPLETE!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ All containers created and started&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ Network connections established&quot;</span><span class="p">)</span> 
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ Visual IP labels added to topology&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ Configuration script created: container_ip_config.sh&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;⚠️  MANUAL IP CONFIGURATION REQUIRED:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   GNS3 API doesn&#39;t support automatic IP configuration.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   Configure each container manually:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;📋 Method 1 - Via GNS3 GUI:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   1. Right-click each container → Edit config&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   2. Set static IP addresses as shown in labels&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   3. Netmask: 255.255.255.0 (no gateway needed)&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   4. Save and restart containers&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;📋 Method 2 - Via Docker commands:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   Use the docker exec commands shown above&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🎯 Target IP Addresses:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;    - Hackergram: 192.168.0.10/24&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;    - Attacker: 192.168.0.100/24&quot;</span><span class="p">)</span> 
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;    - ZAP Desktop: 192.168.0.20/24&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;    - WebTerm: 192.168.0.50/24&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
 
 
 
@@ -1122,7 +1877,7 @@
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.expand", "navigation.tabs.sticky", "navigation.path", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy", "navigation.indexes", "navigation.expand", "navigation.tabs.sticky"], "search": "../../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
       <script src="../../../assets/javascripts/bundle.c8b220af.min.js"></script>
