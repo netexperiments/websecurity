@@ -1,7 +1,9 @@
 # Cross-Site Request Forgery
+A cross-site request occurs when a user interacts with one website via an HTTP request, but that interaction unintentionally triggers an action on a different website. This concept is essential in the CSRF vulnerability, since the attacker exploits the trust a website places in a user’s browser. By tricking the user into performing unintentional actions, such as transferring funds, changing settings, or submitting
+forms, the attacker can execute malicious operations on behalf of the authenticated user. 
 
 ## Attack
-In this attack you will create a post on behalf of user ```mr_robot```. The procedure is the following:
+In this attack you will create a post on behalf of user ```mr_robot```, exploring the `/create_posts` endpoint. The procedure is the following:
 
 1.	Create a file named ```index.html``` at the attacker with the following code:
 

@@ -1,4 +1,9 @@
 # Clickjacking
+Clickjacking, or UI redress attack, is a technique in which attackers trick victims into clicking on hidden
+or disguised elements on a web page. This is typically accomplished by overlaying transparent or
+opaque elements on top of legitimate content, tricking users into performing unintended actions. Such
+actions may include inadvertently downloading malware, exposing confidential information, or initiating
+unauthorized transactions, among other security breaches. 
 
 ## Attack
 Create a post on behalf of a user without their knowledge by tricking them into clicking a disguised button embedded within a malicious site. This attack exploits the fact that Hackergram web application can be embedded inside an iframe. In this case, the `/create_posts` endpoint will be targeted.

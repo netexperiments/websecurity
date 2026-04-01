@@ -1,5 +1,10 @@
 #Improper Output Handling
 
+Improper output handling is a vulnerability in LLM applications that occurs when responses generated
+by the model are missing filtration and sanitization. This vulnerability is especially prevalent in web
+applications where outputs can be dynamically inserted into the DOM and/or used by other services.
+This issue can lead to a wide range of exploitation scenarios, such as XSS, code injection, command injection, and privilege escalation
+
 The Hackergram application contains two endpoints that allow attackers to explore vulnerabilities specific to the integration of Large Language Models (LLMs) in web applications: `/generate_post` and `/leaderboard`.
 
 
@@ -31,3 +36,5 @@ To exploit this flaw, follow these steps:
 2. Once the post is created, select the button that creates an AI summary.
 3. Confirm that the attack was successful by seeing an alert at the top of the page.
 
+## Countermeasure
+TO-DO

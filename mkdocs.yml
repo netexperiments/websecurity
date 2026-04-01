@@ -22,11 +22,7 @@ nav:
       - Injection attacks:
         - SQL Injection: labs/attacks/sqli.md
         - NoSQL Injection: labs/attacks/nosqli.md
-        - Cross-Site Scripting:
-          - Stored XSS: labs/attacks/stored-xss.md
-          - Reflected XSS: labs/attacks/reflected-xss.md
-          - XSS Worm: labs/attacks/xss-worm.md
-          - XSS Countermeasure: labs/attacks/xss-countermeasure.md
+        - Cross-Site Scripting: labs/attacks/xss.md
       - Request Forgery Attacks:
         - Cross-Site Request Forgery: labs/attacks/csrf.md
         - Server Side Request Forgery: labs/attacks/ssrf.md

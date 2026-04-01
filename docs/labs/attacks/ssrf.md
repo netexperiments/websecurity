@@ -1,4 +1,7 @@
 # Server-Side Request Forgery
+In modern web applications, it is common for web applications to accept complete URLs as user input.
+In such cases, the web server initiates a HTTP request to the provided URL. However, if the server does not properly validate the destination, and the URL points to an internal service, the application may become vulnerable to a SSRF attack.
+An SSRF attack happens when an attacker exploits server-side functionality to make arbitrary requests to unintended destinations. This vulnerability allows attackers to access services in the loopback interface, scan internal networks, read local files, abuse cloud service metadata endpoints and potentially move laterally into the internal environment.
 
 This attack targets the `/settings` endpoint. Unlike the previous attack, the objective is to manipulate the server to make unintended requests.
 

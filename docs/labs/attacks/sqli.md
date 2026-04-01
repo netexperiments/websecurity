@@ -1,4 +1,5 @@
 # SQL Injection
+SQL injection is a type of attack in which an attacker injects malicious SQL queries into the input fields of a web application, targeting the SQL database. In case of success, the attacker can perform unauthorized actions, such as accessing sensitive information stored in the database, altering data by inserting, updating, or deleting records, and executing administrative commands, such as shutting down the database management system (DBMS). In more advanced scenarios, SQL injection may allow attackers to retrieve files stored on the DBMS file system or even execute system-level commands. 
 
 Hackergram is vulnerable to several types of SQLi attacks. The following exercises address these vulnerabilities. Some attacks are performed using the victim-browser and others are performed through Python scripts run at the attacker.
 

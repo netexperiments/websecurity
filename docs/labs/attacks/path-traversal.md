@@ -1,4 +1,8 @@
 # Path Traversal
+A path traversal, also called a directory traversal attack, is a web vulnerability that allows attackers to
+access files and directories that are outside the application’s restricted access area, such as the web root or other protected folders. This vulnerability surges because the website uses unsanitized input data
+to reference files and directories on the backend. Attackers exploit file path manipulation sequences, such as ../ , (commonly used in Unix operating systems to access the parent directory) to traverse
+directories and even read or write unauthorized files [37]. While many popular web servers are designed to prevent directory traversal, some encoding techniques can be used to bypass these protections. Examples of those encoding methods include Unicode, URL encoding, double URL encoding, and theuse of backslash characters on Windows servers.
 
 ## Attack
 In this attack, the goal is to manipulate the file upload functionality in the Hackergram application to gain unauthorized access to internal files on the web server. This vulnerability is present in the `/settings` endpoint.

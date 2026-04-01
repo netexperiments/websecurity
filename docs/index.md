@@ -1,11 +1,14 @@
-# Home
+# Hackergram Web Security Lab
 
-The aim of this laboratory work is to study the Web security.
+Hackergram is an intentionally vulnerable social networking web application that serves as the target for security testing. It is designed for students, security enthusiasts, and professionals who want to gain practical experience in identifying, exploiting, and mitigating various types of web vulnerabilities.
+
+This guide provides practical exercises for various attack scenarios. To start, click on the "Laboratory Setup" tab to learn how to set up the laboratory.
+Enjoy!
 
 ## Labs
-
-* Summary information about labs and attacks.
-* The site may include a primer on Web programming and Javascript
+Hackergram has two versions:
+* Hackergram-simple - A version without the LLM related attacks.
+* Hackergram - The full version
 
 ## Contributors
 
