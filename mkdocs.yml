@@ -15,22 +15,26 @@ theme:
     - navigation.expand
     - navigation.tabs.sticky
 nav:
-  - The Hackergram Web Application: labs/hackergram.md
-  - Laboratory Setup: labs/attacks/lab-setup.md
-  - Practical Attacks and Mitigation:
+  - Hackergram Details: labs/hackergram.md
+  - Hackergram Laboratory:
+    - Laboratory Setup: labs/attacks/lab-setup.md
     - Web Security Attacks:
-      - Injection attacks:
+      - Parser-Driven Injections:
         - SQL Injection: labs/attacks/sqli.md
         - NoSQL Injection: labs/attacks/nosqli.md
-        - Cross-Site Scripting: labs/attacks/xss.md
-      - Request Forgery Attacks:
-        - Cross-Site Request Forgery: labs/attacks/csrf.md
-        - Server Side Request Forgery: labs/attacks/ssrf.md
-      - Access and Resource Exploitation:
-        - Path traversal: labs/attacks/path-traversal.md
+        - XXE Injection: labs/attacks/xxe.md
+      - Interpreter-Driven Injections:
+        - LLM-assisted SQL Injection: labs/attacks/llm-assisted-sqli.md
+        - LLM-assisted Stored XSS: labs/attacks/llm-assisted-stored-xss.md
+        - Indirect Prompt Injection: labs/attacks/indirect-prompt-injection.md
+        - System Prompt Leakage: labs/attacks/system-prompt-leakage.md
+        - Cross-Site Scripting (XSS): labs/attacks/xss.md
+      - Access & Resource Control:
+        - Path Traversal: labs/attacks/path-traversal.md
+      - Request & Interaction Forgery:
+        - Cross-Site Request Forgery (CSRF): labs/attacks/csrf.md
         - Clickjacking: labs/attacks/clickjacking.md
-      - LLM Vulnerabilities in Web Contexts:
-        - Prompt Injection: labs/attacks/prompt-injection.md
+        - Server-Side Request Forgery (SSRF): labs/attacks/ssrf.md
 markdown_extensions:
   - admonition
   - pymdownx.details

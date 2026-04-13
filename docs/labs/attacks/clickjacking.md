@@ -101,7 +101,7 @@ To execute the attack, follow these steps:
 
 5.	Run an HTTP server on the attacker using python3 -m http.server 80. Execute this command in the directory used to create the HTML page in the previous step.
 
-6.	In a new tab, visit the attacker’s website by entering http://192.168.0.10/clickjacking.html.
+6.	In a new tab, visit the attacker’s website by entering `http://<hackergram-ip>/clickjacking.html`, replacing `<hackergram-ip>` with the correct host IP for your lab setup.
 
 7.	Click the “Claim Your Prize” button.
 

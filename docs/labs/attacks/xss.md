@@ -2,7 +2,7 @@
 
 Cross-Site Scripting (XSS) is a type of injection attack in which malicious scripts are injected into otherwise trusted web pages. When a victim visits an affected page, the injected script is executed in their browser, allowing the attacker to steal session cookies, redirect users, deface pages, or perform actions on behalf of the victim.
 
-XSS attacks are generally categorized into three types: **Stored XSS**, **Reflected XSS**, and **XSS Worm**. The following sections cover each type and their corresponding countermeasures.
+XSS attacks are generally categorized into three types: **Stored XSS**, **Reflected XSS**, and **XSS Worm**.
 
 ## Stored XSS
 

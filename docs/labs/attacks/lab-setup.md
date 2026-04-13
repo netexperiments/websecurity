@@ -1,6 +1,6 @@
 # Lab Setup
 
-The Hackergram laboratory can be deployed locally in two ways: using **GNS3** for a network-simulated environment, or **standalone** without GNS3. Both approaches rely on Docker, so having Docker installed is a prerequisite. Alternatively, the source code can be obtained directly from the [GitHub repository](https://github.com/netexperiments/websecurity/tree/main){:target="_blank"}.
+The Hackergram laboratory can be deployed locally in two ways: using **GNS3** for a network-simulated environment, or **standalone** without GNS3. Both approaches rely on [Docker](https://www.docker.com/products/docker-desktop/), so having Docker installed is a prerequisite. Alternatively, the source code can be obtained directly from the [GitHub repository](https://github.com/netexperiments/websecurity/tree/main){:target="_blank"}.
 
 ## Prerequisites
 
@@ -16,7 +16,7 @@ The lab experiments will be explained using GNS3 VM. The network scenario for th
 
 ![Image title](lab-setup.png)
 
-The Hackergram Web application is implemented with a Docker container available at the Docker Hub. For the Hackergram, install at GNS3 the container [0xdrogon/hackergram](https://hub.docker.com/r/0xdrogon/hackergram). For the attacker, install at GNS3 the container [0xdrogon/hackergram-attacker](https://hub.docker.com/r/0xdrogon/hackergram-attacker). For the victim-browser use the webterm of GNS3.
+The Hackergram Web application is implemented with a Docker container available at the Docker Hub. For the Hackergram, install at GNS3 the container [pimz23/hackergram](https://hub.docker.com/repository/docker/pimz23/hackergram30). For the attacker, install at GNS3 the container [0xdrogon/hackergram-attacker](https://hub.docker.com/r/0xdrogon/hackergram-attacker). For the victim-browser use the webterm of GNS3.
 
 
 ## Simple Hackergram

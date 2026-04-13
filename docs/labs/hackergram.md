@@ -1,6 +1,6 @@
-# The Hackergram Web application
+# Hackergram Details
 
-Hackergram is an intentionally vulnerable Web application that was designed with the purpose of providing students and security enthusiasts with an environment where they can familiarize themselves with and gain practical experience in identifying, exploiting, and mitigating various types of Web vulnerabilities, mainly [CSRF](attacks/csrf.md), XSS ([Stored](attacks/stored-xss.md), [Reflected](attacks/reflected-xss.md), [Worm](attacks/xss-worm.md)) and [SQLi](attacks/sqli.md). It consists of a simple social networking website. In Hackergram, users can create an account by registering their username, password, and name. Once registered, users can log into their account and start using its various features:
+Hackergram is an intentionally vulnerable Web application that was designed with the purpose of providing students and security enthusiasts with an environment where they can familiarize themselves with and gain practical experience in identifying, exploiting, and mitigating various types of Web vulnerabilities. It consists of a simple social networking website. In Hackergram, users can create an account by registering their username, password, and name. Once registered, users can log into their account and start using its various features:
 
 * Posts are the main feature of the website. Users can write posts that will then be shown to other users on the homepage.
 * Posts can also be edited or deleted.

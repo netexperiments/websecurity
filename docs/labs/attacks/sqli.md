@@ -486,3 +486,136 @@ The vulnerable string formatting allows us to break out of the current UPDATE st
 - Delete user: `'; DELETE FROM Users WHERE username='dpr'; -- `
 
 </details>
+
+## Countermeasures
+
+In Hackergram, `views.py` reads form fields and query parameters and passes them into `models.py`. **The weakness is building SQL with Python’s `%` formatting**: user input becomes part of the query *text*. The fix is to keep the SQL shape fixed and pass values as **bound parameters** in `cursor.execute(sql, tuple)`.
+
+The examples below mirror the real Hackergram layout: **routes in `views.py`**, **queries in `models.py`** (plus one `DELETE` built in `views.py`).
+
+### How requests reach the database (`views.py`)
+
+These call sites feed untrusted data into functions that currently format SQL strings:
+
+| What you test in the lab | In `views.py` | In `models.py` |
+|--------------------------|---------------|----------------|
+| Login bypass | `user = models.login(username, password)` after reading `request.form` | `login()` |
+| Search `/posts`, union/boolean/time-based | `posts = models.get_posts(query)` | `get_posts()` |
+| Profile `UPDATE` | `models.update_user_settings(username, new_name, ...)` from `/settings` | `update_user_settings()` |
+| (Optional) Admin delete user | `"DELETE FROM Users WHERE username = '%s'" % user_to_delete` then `commit_to_database` | N/A — fix this line in `views.py` |
+
+You usually **do not** need to change how the route reads `request.form`; you change how `models.py` (and that admin `DELETE`) executes SQL.
+
+### Fix `login` (stops authentication bypass)
+
+**Today in `models.py` (vulnerable):** quotes in `username` / `password` break out of the string.
+
+```python
+def login(username, password):
+    query = "SELECT * FROM Users"
+    query += " WHERE username = '%s'" % (username)
+    query += " AND password = '%s'" % (password)
+    data = get_from_database(query)
+    ...
+```
+
+**Safer:** placeholders `%s` for the values only.
+
+```python
+def login(username, password):
+    sql = "SELECT * FROM Users WHERE username = %s AND password = %s"
+    con = mysql.connection.cursor()
+    con.execute(sql, (username, password))
+    mysql.connection.commit()
+    data = con.fetchall()
+    con.close()
+    if len(data) == 1:
+        return User(*(data[0]))
+    return None
+```
+
+Payloads like `admin' AND 1=1 -- ` are then treated as the **literal** username, not SQL syntax.
+
+### Fix `get_posts` (stops search / `UNION` / inference tricks on `/posts`)
+
+**Today in `models.py` (vulnerable):** the search term is embedded inside `LIKE '%%%s%%'`.
+
+```python
+def get_posts(search):
+    query = "SELECT Posts.id, Users.username, ..."
+    query += " WHERE Posts.content LIKE '%%%s%%'" % (search)
+    data = get_from_database(query)
+    ...
+```
+
+**Safer:** build the `%...%` pattern in Python; bind it as **one** value.
+
+```python
+def get_posts(search):
+    sql = (
+        "SELECT Posts.id, Users.username, Users.name, Users.photo, Posts.content, Posts.posted_at "
+        "FROM Posts INNER JOIN Users ON Posts.author = Users.username "
+        "WHERE Posts.content LIKE %s"
+    )
+    pattern = f"%{search}%"
+    con = mysql.connection.cursor()
+    con.execute(sql, (pattern,))
+    mysql.connection.commit()
+    data = con.fetchall()
+    con.close()
+    ...
+```
+
+Apply the same pattern anywhere else you see `LIKE '%%%s%%'` (for example `get_users`, `get_friends`).
+
+### Fix `update_user_settings` (stops piggybacked `UPDATE` in profile fields)
+
+**Today in `models.py` (vulnerable):** all fields are pasted into the statement, including `bio`.
+
+```python
+def update_user_settings(username, name, password, bio, photo):
+    query = "UPDATE Users"
+    query += " SET username='%s', password='%s', name='%s', bio='%s', photo='%s'" % (
+        username, password, name, bio, photo)
+    query += " WHERE username = '%s'" % (username)
+    commit_to_database(query)
+```
+
+**Safer:**
+
+```python
+def update_user_settings(username, name, password, bio, photo):
+    sql = (
+        "UPDATE Users SET username=%s, password=%s, name=%s, bio=%s, photo=%s "
+        "WHERE username=%s"
+    )
+    con = mysql.connection.cursor()
+    con.execute(sql, (username, password, name, bio, photo, username))
+    mysql.connection.commit()
+    con.close()
+```
+
+### Fix admin delete user (`views.py`)
+
+**Today (vulnerable fragment):**
+
+```python
+query = "DELETE FROM Users WHERE username = '%s'" % user_to_delete
+models.commit_to_database(query)
+```
+
+**Safer:** parameterized delete (example — use the same `mysql` handle your app already uses):
+
+```python
+con = mysql.connection.cursor()
+con.execute("DELETE FROM Users WHERE username = %s", (user_to_delete,))
+mysql.connection.commit()
+con.close()
+```
+
+### Still use least privilege and safer errors
+
+- Give the app DB account only the rights it needs (no `DROP` / file read), so piggybacked statements have less impact if something is missed.
+- The `error()` helper in `views.py` can expose exception text to the browser, which helps **error-based** SQLi. Log details on the server; show users a **generic** message.
+
+**Takeaway:** parameterized `execute(sql, params)` in `models.py` (and for the admin `DELETE` in `views.py`) matches how Hackergram is structured and closes the same holes you exploit in the exercises.
