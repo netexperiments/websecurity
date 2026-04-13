@@ -1,4 +1,4 @@
-me: deploy MkDocs site
+name: deploy MkDocs site
 on:
   push:
     branches:
