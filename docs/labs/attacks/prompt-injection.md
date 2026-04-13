@@ -34,11 +34,5 @@ To exploit this flaw, follow these steps:
 2. Once the post is created, select the button that creates an AI summary.
 3. Confirm that the attack was successful by seeing an alert at the top of the page.
 
-## Indirect Prompt Injection
-TO-DO
-
-## System Prompt Leakage
-TO-DO
-
 ## Countermeasure
 TO-DO
