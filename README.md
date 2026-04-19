@@ -1,94 +1,113 @@
-﻿# Web Security Laboratory
+# Hackergram Lab
 
-A comprehensive educational platform for learning web security through hands-on practical exercises using **Hackergram**, an intentionally vulnerable web application.
 
-## Project Overview
+## Description
 
-This repository contains a complete web security laboratory designed for students, security enthusiasts, and professionals who want to gain practical experience in identifying, exploiting, and mitigating various types of web vulnerabilities.
+Hackergram is an intentionally vulnerable web application that was designed with the purpose of providing students and security enthusiasts with a lab environment where they can gain practical experience in identifying and exploiting web vulnerabilities, such as Cross-Site Request Forgery, Cross-Site Scripting and SQL Injection.
 
-### What is Hackergram?
 
-**Hackergram** is an intentionally vulnerable social networking web application that serves as the target for security testing. It features:
+## Summary 
 
-- **User Registration & Authentication** - Create accounts and manage user sessions
-- **Social Features** - Posts, friendship requests, user profiles
-- **Search Functionality** - Search for posts and users  
-- **User Settings** - Profile customization and account management
-- **Reset Endpoint** - Restore application to initial state for clean testing
+This vulnerable web application consists of a simple social networking website. In Hackergram, users can create an account by registering their username, password and name. Once registered, users can log into their account and start using its various features:
+- Posts are the main feature of the website. Users can write posts that will then be shown to other users on the homepage.
+- Posts can also be edited or deleted.
+- Users can connect with each other by sending friendship requests, which can be accepted or declined.
+- A user can also remove his friendship with another user at any time.
+- Users can navigate to any user's profile to see their information (i.e., name, username, picture and bio), as well as their posts and friends.
+- A user is allowed to change their own settings (i.e., name, password, picture and bio).
+- There is a search functionality that allows users to search for posts with a specific word or content and search for other users by username.
 
-## Security Vulnerabilities Covered
+Hackergram is not an attempt at replicating or improving upon any existing social networking websites. Instead, it provides a controlled environment where students and security enthusiasts can test their knowledge and skills without causing any harm to real-world systems or users. Hackergram was created to be a simple, yet realistic web application and its features were purposefully designed to be vulnerable to these attacks.
 
-The laboratory includes practical exercises for the following attack vectors:
 
-### Injection Attacks
-- **[SQL Injection](docs/labs/attacks/sqli.md)** - Error-based, Union-based, Boolean-based, and Piggybacked SQLi
-- **[NoSQL Injection](docs/labs/attacks/nosqli.md)** - NoSQL database attack techniques
+## Setting up the lab
 
-### Cross-Site Scripting (XSS)
-- **[Stored XSS](docs/labs/attacks/stored-xss.md)** - Persistent XSS attacks
-- **[Reflected XSS](docs/labs/attacks/reflected-xss.md)** - Non-persistent XSS attacks  
-- **[XSS Worm](docs/labs/attacks/xss-worm.md)** - Self-propagating XSS attacks
-- **[XSS Countermeasures](docs/labs/attacks/xss-countermeasure.md)** - Prevention and mitigation strategies
+### 1. Clone this repository
 
-### Request Forgery & Access Exploitation
-- **[Cross-Site Request Forgery (CSRF)](docs/labs/attacks/csrf.md)** - CSRF attack scenarios
-- **[Clickjacking](docs/labs/attacks/clickjacking.md)** - UI redressing attacks
-- **[Path Traversal](docs/labs/attacks/path-traversal.md)** - Directory traversal vulnerabilities
-
-## Getting Started
-
-### Prerequisites
-- Web browser
-- Basic understanding of web technologies (HTML, HTTP, JavaScript)
-- Python environment (for attack scripts)
-
-### Setup
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/netexperiments/websecurity.git
-   cd websecurity
-   ```
-
-2. Follow the [Laboratory Setup Guide](docs/labs/attacks/lab-setup.md) for detailed environment configuration
-
-3. Start exploring the [Hackergram Web Application](docs/labs/hackergram.md)
-
-## Documentation
-
-The project uses **MkDocs** with Material theme for comprehensive documentation. 
-
-### View Documentation Locally
-```bash
-# Install MkDocs and dependencies
-pip install mkdocs mkdocs-material
-
-# Serve documentation locally
-mkdocs serve
+```
+$ git clone https://github.com/0xDrogon/hackergram-lab.git
 ```
 
-Visit `http://localhost:8000` to browse the interactive documentation.
+### 2. Run the script
+
+```
+$ chmod +x docker_run.sh
+$ ./docker_run.sh
+```
+
+### 3. Hackergram is available at
+
+```
+http://localhost:5000
+```
+
+### Docker image
+
+A Docker image is also available at `https://hub.docker.com/r/0xdrogon/hackergram`
+```
+docker pull 0xdrogon/hackergram
+```
 
 
-## Educational Context
+## Default users
 
-This laboratory is designed for:
-- **Computer Science Students** learning web security fundamentals
-- **Security Professionals** practicing penetration testing techniques  
-- **Developers** understanding common vulnerabilities and secure coding practices
-- **Security Enthusiasts** exploring ethical hacking methodologies
+| Username   | Password       |
+|------------|----------------|
+| admin      | 1_4m_Th3_4dm1n |
+| mr_robot   | elliot123      | 
+| dpr        | silk-road      | 
+| satoshi    | bitcoin2009    | 
+| heisenberg | walter1958     |
+| rick       | RickC-137      | 
+| stark      | winterfell     | 
+| anon1      | 1              | 
+| anon2      | 2              | 
+| anon3      | 3              | 
 
-## Important Notice
 
-**This application is intentionally vulnerable and should NEVER be deployed in a production environment.** It is designed solely for educational purposes in controlled environments.
+## Attacks tested
 
-## 🤝 Contributors
+- Cross-Site Request Forgery
+    - CSRF with a GET request
+        - on `/delete_post` endpoint
+        - on `/requests` endpoint 
+    - CSRF with a POST request
+        - on `/create_post` endpoint
+        - on `/edit_post` endpoint
+        - on `/request_friend` endpoint
+        - on `/remove_friend` endpoint
+- Cross-Site Scripting
+    - Stored XSS
+        - on `/create_post` endpoint
+        - on `/settings` endpoint
+    - Reflected XSS
+        - on `/users` endpoint
+        - on `/posts` endpoint
+    - XSS worm
+        - on `/create_post` endpoint
+        - on `/settings` endpoint
+- SQL Injection
+    - Authentication bypass
+        - on `/login` endpoint
+    - Union-based SQLi
+        - on `/users` endpoint
+        - on `/posts` endpoint
+    - Piggybacked SQLi
+        - on `/users` endpoint
+        - on `/posts` endpoint
+    - Eror-based SQLi
+        - on `/users` endpoint
+        - on `/posts` endpoint
+    - Boolean-based SQLi
+        - on `/users` endpoint
+        - on `/posts` endpoint
+    - Time-based SQLi
+        - on `/users` endpoint
+        - on `/posts` endpoint
+    - Using SQLi to change other user's profile
+        - on `/settings` endpoint
 
-- **João Pimentel** - [Instituto Superior Técnico, Universidade de Lisboa](https://tecnico.ulisboa.pt/pt/)
-- **Rui Valadas** - [Instituto Superior Técnico, Universidade de Lisboa](https://tecnico.ulisboa.pt/pt/)  
-- **Tiago Domingues** - [LastPass](https://www.lastpass.com/)
 
-## 📄 License
+## Disclaimer
 
-This project is intended for educational use. Please ensure responsible disclosure and ethical use of the techniques learned.
-
----
+This lab is extremely vulnerable and intended for educational purposes only. Do not use it in production.
