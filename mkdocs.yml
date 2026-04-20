@@ -15,20 +15,23 @@ theme:
     - navigation.expand
     - navigation.tabs.sticky
 nav:
-  - Hackergram Details: labs/hackergram.md
-  - Hackergram Laboratory:
-    - Laboratory Setup: labs/attacks/lab-setup.md
+  - Hackergram Overview: labs/hackergram.md
+  - Laboratory Setup: 
+    - Lab Setup: labs/attacks/lab-setup.md
+  - Web Security Experiments:
     - Web Security Attacks:
       - Parser-Driven Injections:
         - SQL Injection: labs/attacks/sqli.md
         - NoSQL Injection: labs/attacks/nosqli.md
         - XXE Injection: labs/attacks/xxe.md
       - Interpreter-Driven Injections:
-        - LLM-assisted SQL Injection: labs/attacks/llm-assisted-sqli.md
-        - LLM-assisted Stored XSS: labs/attacks/llm-assisted-stored-xss.md
-        - Indirect Prompt Injection: labs/attacks/indirect-prompt-injection.md
-        - System Prompt Leakage: labs/attacks/system-prompt-leakage.md
         - Cross-Site Scripting (XSS): labs/attacks/xss.md
+        - LLM-related Attacks:
+          - Overview: labs/attacks/prompt-injection.md
+          - LLM-mediated SQL Injection: labs/attacks/llm-mediated-sqli.md
+          - LLM-mediated Stored XSS: labs/attacks/llm-mediated-stored-xss.md
+          - Indirect Prompt Injection: labs/attacks/indirect-prompt-injection.md
+          - System Prompt Leakage: labs/attacks/system-prompt-leakage.md
       - Access & Resource Control:
         - Path Traversal: labs/attacks/path-traversal.md
       - Request & Interaction Forgery:

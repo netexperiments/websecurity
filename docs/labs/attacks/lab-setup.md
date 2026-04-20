@@ -1,29 +1,38 @@
 # Lab Setup
 
-The Hackergram laboratory can be deployed locally in two ways: using **GNS3** for a network-simulated environment, or **standalone** without GNS3. Both approaches rely on [Docker](https://www.docker.com/products/docker-desktop/), so having Docker installed is a prerequisite. Alternatively, the source code can be obtained directly from the [GitHub repository](https://github.com/netexperiments/websecurity/tree/main){:target="_blank"}.
+The laboratory environment is designed for local deployment on a single host. Hackergram runs as a Python web application, and users interact with it through a standard web browser. Some attacks are launched through auxiliary Python scripts, while others may additionally use an intercepting proxy such as [Burp Suite](https://portswigger.net/burp){:target="_blank"} or [OWASP ZAP](https://www.zaproxy.org/){:target="_blank"} to observe and manipulate HTTP traffic. For the LLM-integrated functionality, [Ollama](https://ollama.com/){:target="_blank"} is installed locally and provides the model-serving interface consumed by Hackergram. In this single-host setup, the application, browser, proxy, and LLM service can communicate through the loopback interface (e.g., `localhost` or `127.0.0.1`) using distinct ports, which simplifies deployment and improves reproducibility in a controlled experimental environment.
 
-## Prerequisites
+The source code for Hackergram, along with the attack scripts used in the experiments, is available on [GitHub](https://github.com/netexperiments/websecurity){:target="_blank"}.
 
-Before setting up the lab environment, if you want to use it via GNS3 ensure you have the following components installed and configured:
+## Docker Containers
+
+Two Docker containers are provided through [Docker Hub](https://hub.docker.com/){:target="_blank"} to facilitate deployment.
+
+### Simple Hackergram
+
+The [Simple Hackergram](https://hub.docker.com/r/pimz23/hackergram-simple){:target="_blank"} container offers a lightweight version of the application containing only the core web application and its essential dependencies. It does not include the LLM integration, making it suitable for introductory exercises that cover the foundational vulnerability categories and easier to deploy on machines with limited resources.
+
+### Full Hackergram
+
+The [full Hackergram](https://hub.docker.com/repository/docker/pimz23/hackergram30){:target="_blank"} container provides the complete version of the lab, including the additional components required for the full set of experiments, including LLM-integrated attacks. Distributing both variants as containers improves portability, reproducibility, and ease of deployment across different systems.
+
+## GNS3 Deployment
+
+The experiments can also be deployed in [GNS3](https://www.gns3.com/){:target="_blank"} using the provided Docker containers. The network scenario for the GNS3 topology is shown below.
+
+![Lab topology](lab-setup.png)
+
+To simplify this process, an automation script developed using the GNS3 API and Ansible is available through this website. It configures the GNS3 environment and instantiates the required lab topology automatically, reducing manual setup effort and improving reproducibility.
+
+### GNS3 Prerequisites
+
+Before setting up the GNS3 topology, ensure the following components are installed and configured:
 
 - **GNS3**: The main network simulation platform must be installed on your host system
-- **GNS3VM**: The GNS3 Virtual Machine should be installed and configured on VMware (recommended virtualization platform for optimal performance and compatibility)
-- **VMware**: VMware Workstation (Windows/Linux) or VMware Fusion (macOS) is the recommended hypervisor for running GNS3VM
+- **GNS3 VM**: The GNS3 Virtual Machine should be installed and configured on VMware (recommended for optimal performance and compatibility)
+- **VMware**: VMware Workstation (Windows/Linux) or VMware Fusion (macOS) is the recommended hypervisor for running the GNS3 VM
 
-## Lab Environment
-
-The lab experiments will be explained using GNS3 VM. The network scenario for the experiments is shown in the following Figure. Another alternative is to use it locally by installing the adequate docker containers and requirements.
-
-![Image title](lab-setup.png)
-
-The Hackergram Web application is implemented with a Docker container available at the Docker Hub. For the Hackergram, install at GNS3 the container [pimz23/hackergram](https://hub.docker.com/repository/docker/pimz23/hackergram30). For the attacker, install at GNS3 the container [0xdrogon/hackergram-attacker](https://hub.docker.com/r/0xdrogon/hackergram-attacker). For the victim-browser use the webterm of GNS3.
-
-
-## Simple Hackergram
-
-To facilitate the introduction of key concepts, a simplified version of the application, **Simple Hackergram**, has been developed. This version of the laboratory includes only a subset of the vulnerabilities and attack scenarios, and it requires fewer computational resources and dependencies. It is intended as a preparatory step before progressing to the full-featured Hackergram environment.
-
-## GNS3 Lab Configuration
+### GNS3 Setup Script
 
 ??? note "GNS3 Setup Script"
 

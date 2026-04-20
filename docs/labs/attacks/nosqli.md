@@ -21,7 +21,7 @@ In addition to syntax manipulation, the Hackergram application is also vulnerabl
 
 1.	In the webterm, locate the search messages page of Hackergram.
 2.	In the search field, submit the following payload: 
-{"$gt": ""}
+``` {"$gt": ""} ```
 3.	Observe that the server answers with an error, meaning that the backend query is indeed influenced by the injected operators.
 Additional exercise: Based on the error and information, try to extract all messages from the database.
 

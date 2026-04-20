@@ -8,9 +8,9 @@ Enjoy!
 ## Labs
 Hackergram currently has two versions:
 
-**Hackergram-simple** - A version without the LLM related attacks.
+**Hackergram-simple** -  [A version without the LLM related attacks](https://hub.docker.com/r/pimz23/hackergram-simple){:target="_blank"} 
 
-**Hackergram** - [The full version](https://hub.docker.com/repository/docker/pimz23/hackergram30){:target="_blank"}
+**Hackergram** - [The full version](https://hub.docker.com/r/pimz23/hackergram30){:target="_blank"}
 
 ## Contributors
 

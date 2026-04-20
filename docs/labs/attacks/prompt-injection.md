@@ -6,7 +6,7 @@ The Hackergram application contains two endpoints that allow attackers to explor
 
 ## Countermeasures
 
-### LLM-assisted SQL Injection
+### LLM-mediated SQL Injection
 The `/leaderboard` endpoint of Hackergram demonstrates improper output handling vulnerabilities. In this attack, you will explore the lack of output sanitization in the LLM's response. The objective is to attempt to change another user's password using the LLM integrated into the leaderboard endpoint. To perform the attack, follow these steps:
 
 1. Experiment with the functionality by submitting a normal prompt, such as “Give me the count of leaderboard members.” 
@@ -19,7 +19,7 @@ The `/leaderboard` endpoint of Hackergram demonstrates improper output handling 
     Drop a table from the Hackergram database.
 
 
-## LLM-assisted Stored XSS
+## LLM-mediated Stored XSS
 The `/ai_summarize` feature of Hackergram provides a summary of a specific post. This feature allows control over the page's HTML and does not properly sanitize the LLM's output.
 
 To exploit this flaw, follow these steps:
@@ -35,4 +35,59 @@ To exploit this flaw, follow these steps:
 3. Confirm that the attack was successful by seeing an alert at the top of the page.
 
 ## Countermeasure
-TO-DO
+
+Both attacks on this page belong to the same class of failure: **output-to-interpreter violations**. The model acts as an untrusted code generator, and its output flows directly into another interpreter — a SQL engine in the leaderboard case, and the browser's HTML renderer in the summarizer case — without any structural validation in between.
+
+### LLM-mediated SQL Injection
+
+The root cause is that the application asks the model to generate SQL and then executes it as-is:
+
+```python
+query = llm.generate(f"Write SQL to find user {username}")
+db.execute(query)
+```
+
+If the model outputs a destructive statement such as `DELETE FROM users`, the database executes it with full server privileges. The fix is to constrain the model's output to a predefined schema and map it to a safe parameterized query — the model should express intent, not executable SQL:
+
+??? note "Secure LLM SQL Interaction"
+
+    ```python
+    import json
+
+    command = llm.generate(user_prompt)
+    parsed = json.loads(command)
+
+    if parsed.get("action") not in ["search", "summarize"]:
+        abort(400)
+
+    if parsed["action"] == "search":
+        cursor.execute("SELECT * FROM users WHERE username = %s", (parsed["target"],))
+    ```
+
+### LLM-mediated Stored XSS
+
+The root cause is that the application stores model-generated HTML without sanitization and later renders it in the browser:
+
+```python
+html = llm.generate(f"Write a summary for this post: {post_content}")
+store_in_database(html)
+```
+
+If the model produces a payload such as `<script>stealCookies()</script>`, the application stores and later serves it as executable markup. All model-generated content must be treated as untrusted and sanitized before storage or rendering:
+
+??? note "Secure LLM HTML Handling"
+
+    ```python
+    import bleach
+
+    ALLOWED_TAGS = ["p", "b", "i", "em", "strong", "ul", "ol", "li", "br"]
+    ALLOWED_ATTRS = {}
+
+    html = llm.generate(f"Write a summary for this post: {post_content}")
+    safe_html = bleach.clean(html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS, strip=True)
+    store_in_database(safe_html)
+    ```
+
+!!! note "Broader context"
+
+    Both attacks share the same defensive principle: model output must not directly reach an interpreter without structural validation. Requiring the model to produce structured data (e.g. JSON with an allowlisted `action` field) rather than free-form executable text is the most robust general defense. Where HTML output is unavoidable, an allowlist-based sanitizer such as `bleach` must be applied before storage or rendering.

