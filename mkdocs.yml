@@ -26,12 +26,10 @@ nav:
         - XXE Injection: labs/attacks/xxe.md
       - Interpreter-Driven Injections:
         - Cross-Site Scripting (XSS): labs/attacks/xss.md
-        - LLM-related Attacks:
-          - Overview: labs/attacks/prompt-injection.md
-          - LLM-mediated SQL Injection: labs/attacks/llm-mediated-sqli.md
-          - LLM-mediated Stored XSS: labs/attacks/llm-mediated-stored-xss.md
-          - Indirect Prompt Injection: labs/attacks/indirect-prompt-injection.md
-          - System Prompt Leakage: labs/attacks/system-prompt-leakage.md
+        - LLM-mediated SQL Injection: labs/attacks/llm-mediated-sqli.md
+        - LLM-mediated Stored XSS: labs/attacks/llm-mediated-stored-xss.md
+        - Indirect Prompt Injection: labs/attacks/indirect-prompt-injection.md
+        - System Prompt Leakage: labs/attacks/system-prompt-leakage.md
       - Access & Resource Control:
         - Path Traversal: labs/attacks/path-traversal.md
       - Request & Interaction Forgery:
