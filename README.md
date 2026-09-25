@@ -1,63 +1,162 @@
-# Hackergram Overview
+# Hackergram — An Open-Source Platform for Classical and LLM-Driven Web Security Experimentation
 
-Hackergram is a purpose-built vulnerable social networking application designed to give students and security practitioners a realistic environment for exploring web security flaws. It is used throughout this lab as the primary target for both classical web attacks and vulnerabilities introduced by LLM integration. The codebase is kept small enough that every component can be read and understood directly, while still covering a broad enough range of functionality - authentication, content management, messaging, search, and AI-assisted features - to make the experiments meaningful.
+Hackergram is a deliberately vulnerable social-networking application, released fully open source so every
+part of it can be read and inspected. It is built for both classical web-security experiments (SQL
+injection, XSS, CSRF, and more) and attacks that involve LLM integration, such as prompt injection and
+LLM-mediated SQL injection. It can be deployed locally, packaged as Docker containers, or run inside a full
+GNS3 network topology for reproducible, isolated experimentation.
 
-Because the source code is fully open, users are encouraged to go beyond running the provided attacks: inspect the vulnerable implementation, trace how untrusted input reaches an interpreter, apply the suggested countermeasures directly in the code, and verify that the fix works. This makes Hackergram a flexible platform for experimenting not only with exploits but also with the practical design and testing of defenses.
+**Companion website (setup guides and all experiments):** <https://netexperiments.github.io/websecurity/>
+
+> **Warning:** Hackergram is intentionally vulnerable. Run it only on your own machine or an isolated
+> network, and never expose it to the Internet. It is intended for educational and research purposes only.
+> See [Safety and Ethical Use](https://netexperiments.github.io/websecurity/safety/).
 
 ## Features
 
-Users can create an account by registering a username, password, and name. Once logged in, the following features are available:
+- **Posts:** create, edit, and delete posts shown to all users on the homepage
+- **Friends:** send, accept, or decline friendship requests, and remove friendships
+- **Profiles:** view any user's name, username, picture, bio, posts, and friends
+- **Settings:** update your own name, password, picture, and bio
+- **Search:** search posts by content or users by username
+- **Messages:** exchange direct messages with other users
+- **AI features:** AI-assisted post generation, post summarization, and a natural-language leaderboard,
+  powered by locally hosted LLMs served through Ollama
+- **Reset:** the `/reset` endpoint restores the application to its initial state at any time
 
-- **Posts** - Create, edit, and delete posts that are visible to all users on the homepage
-- **Friends** - Send, accept, or decline friendship requests, and remove existing friendships
-- **Profiles** - View any user's profile, including their name, username, picture, bio, posts, and friends
-- **Settings** - Update your own name, password, picture, and bio
-- **Search** - Search for posts by content or find other users by username
-- **Messages** - Exchange direct messages with other users
-- **AI Features** - AI-assisted post generation and post summarization powered by a locally hosted LLM (Ollama/Mistral)
-- **Reset** - The `/reset` endpoint restores the application to its initial state, which is useful after attacks that break or corrupt it
+## Covered experiments
 
-## Default Users
+Each experiment is documented step by step on the companion website, with the vulnerable code to inspect and
+a countermeasure to implement:
 
-The initial state of Hackergram includes the following pre-configured users. The user `mr_robot` has the most data associated with their account.
+- **Parser-driven injections:** SQL injection, NoSQL injection, XXE injection
+- **Interpreter-driven injections:** cross-site scripting (stored, reflected, XSS worm), LLM-mediated SQL
+  injection, LLM-mediated stored XSS, indirect prompt injection, system prompt leakage
+- **Access and resource control:** path traversal
+- **Request and interaction forgery:** CSRF, clickjacking, SSRF
 
-| User       | Password       |
-|------------|----------------|
-| admin      | 1_4m_Th3_4dm1n |
-| mr_robot   | elliot123      |
-| dpr        | silk-road      |
-| satoshi    | bitcoin2009    |
-| heisenberg | walter1958     |
-| rick       | RickC-137      |
-| stark      | winterfell     |
-| anon1      | 1              |
-| anon2      | 2              |
-| anon3      | 3              |
+## Architecture
 
-## Covered Attacks
+Hackergram is a Python/Flask application with Jinja2 templates and a Bootstrap frontend. It stores its data
+in MySQL (users, posts, friendships, leaderboard) and MongoDB (LLM chat history, direct messages), and calls
+a local Ollama server for its AI features. See the
+[Architecture](https://netexperiments.github.io/websecurity/architecture/) page for details.
 
-The following attacks are covered in this lab, organized by category:
+| File / directory | Role |
+|---|---|
+| `hackergram.py` | Flask application entry point; configures the app and its databases |
+| `views.py` | All routes: reads request data, calls `models.py` and Ollama, renders templates |
+| `models.py` | Data-access layer for MySQL and MongoDB |
+| `templates/` | Jinja2 templates |
+| `static/` | CSS, JavaScript, and profile pictures |
+| `start.sql` | MySQL schema and seed data (default users, posts, friendships) |
+| `container_start.sh` | Container start script: starts MySQL and MongoDB, loads `start.sql`, starts Ollama, launches the app |
+| `requirements.txt` | Python dependencies |
 
-**Parser-Driven Injections**
+## Deployment options
 
-- [SQL Injection](https://netexperiments.github.io/websecurity/labs/attacks/sqli/) - Error-based, union-based, boolean-based, piggybacked, and authentication bypass
-- [NoSQL Injection](https://netexperiments.github.io/websecurity/labs/attacks/nosqli/) - Syntax injection and operator injection
-- [XXE Injection](https://netexperiments.github.io/websecurity/labs/attacks/xxe/) - File retrieval and Billion Laughs denial of service
+| Deployment | Docker image(s) | Classical attacks | LLM attacks | GNS3 | Recommended use |
+|---|---|---|---|---|---|
+| Simple | `pimz23/hackergram-simple:latest` | Yes | No | No | Fastest introduction |
+| Full | `pimz23/hackergram30:latest` | Yes | Yes | No | Complete single-host experimentation |
+| GNS3 | `pimz23/hackergram30:latest`, `pimz23/my-gns3-attacker:1.5`, `pimz23/zap-desktop-novnc:latest`, `gns3/webterm:latest` | Yes | Yes | Yes | Networked experiments |
 
-**Interpreter-Driven Injections**
+The simple image has no Ollama and none of the LLM endpoints. The full image (about 8.8 GB compressed)
+includes Ollama and both LLM models.
 
-- [Cross-Site Scripting (XSS)](https://netexperiments.github.io/websecurity/labs/attacks/xss/) - Stored XSS, reflected XSS, and XSS worm
-- [LLM-mediated SQL Injection](https://netexperiments.github.io/websecurity/labs/attacks/llm-mediated-sqli/) - SQL injection via LLM-generated queries at the `/leaderboard` endpoint
-- [LLM-mediated Stored XSS](https://netexperiments.github.io/websecurity/labs/attacks/llm-mediated-stored-xss/) - Stored XSS via unsanitized LLM output at the `/ai_summarize` endpoint
-- [Indirect Prompt Injection](https://netexperiments.github.io/websecurity/labs/attacks/indirect-prompt-injection/) - Injecting hidden instructions through attacker-controlled external content
-- [System Prompt Leakage](https://netexperiments.github.io/websecurity/labs/attacks/system-prompt-leakage/) - Extracting internal LLM configuration through prompt manipulation
+## Quick start (Docker)
 
-**Access & Resource Control**
+Requires Docker (tested with Docker Desktop 4.63.0, Docker Engine 29.2.1). Python is not needed: everything
+runs inside the container.
 
-- [Path Traversal](https://netexperiments.github.io/websecurity/labs/attacks/path-traversal/) - Accessing files outside the intended directory via crafted paths
+1. Pull an image (simple shown here; use `pimz23/hackergram30:latest` for the full version):
 
-**Request & Interaction Forgery**
+   ```bash
+   docker pull pimz23/hackergram-simple:latest
+   ```
 
-- [Cross-Site Request Forgery (CSRF)](https://netexperiments.github.io/websecurity/labs/attacks/csrf/) - Forging authenticated requests through a malicious page
-- [Clickjacking](https://netexperiments.github.io/websecurity/labs/attacks/clickjacking/) - Tricking users into interacting with hidden UI elements
-- [Server-Side Request Forgery (SSRF)](https://netexperiments.github.io/websecurity/labs/attacks/ssrf/) - Forcing the server to issue requests to unintended internal or external targets
+2. Start Hackergram:
+
+   ```bash
+   docker run -d --name hackergram -p 80:80 pimz23/hackergram-simple:latest
+   ```
+
+   The web application listens on port 80. If port 80 is taken, use `-p 8080:80` and open
+   `http://localhost:8080/` instead.
+
+3. Open <http://localhost:8080//> and log in as `mr_robot` / `elliot123`. The full list of default users is on
+   the [Hackergram Overview](https://netexperiments.github.io/websecurity/labs/hackergram/) page.
+
+4. To restore the initial state at any time, open <http://localhost/reset>.
+
+5. Stop and remove the container:
+
+   ```bash
+   docker stop hackergram
+   docker rm hackergram
+   ```
+
+The full step-by-step guide is on the [Quick Start](https://netexperiments.github.io/websecurity/quickstart/)
+page. The GNS3 deployment, including the topology automation script, is described on the
+[Lab Setup](https://netexperiments.github.io/websecurity/labs/attacks/lab-setup/) page.
+
+## LLM configuration
+
+Served by Ollama 0.17.7 through `POST http://localhost:11434/api/generate`. Each endpoint names its model
+directly in `views.py`:
+
+| Endpoint | Model | Inference options |
+|---|---|---|
+| `/leaderboard` | `llama2` (Llama 2, 7B) | temperature `0.1`, seed `42` |
+| `/generate_post` | `mistral` (Mistral, 7B) | Ollama defaults |
+| `/ai_summarize` | `mistral` (Mistral, 7B) | temperature `0.4`, seed `123` |
+
+When running outside the full Docker image, pull both models first:
+
+```bash
+ollama pull llama2
+ollama pull mistral
+```
+
+## Tested environment
+
+| Component | Version |
+|---|---|
+| Operating system | Ubuntu 24.04.4 LTS (WSL 2 on Windows 11) |
+| Python | 3.12.3 |
+| Flask | 3.1.3 |
+| MySQL | 8.0.46 |
+| MongoDB | 8.0.19 |
+| Docker | Docker Desktop 4.63.0 (Engine 29.2.1) |
+| GNS3 | 2.2 |
+| Ollama | 0.17.7 |
+| LLM models | `llama2` (7B), `mistral` (7B) |
+
+The Docker images are built on Ubuntu 20.04, so package versions inside the containers may differ.
+See [Reproducibility](https://netexperiments.github.io/websecurity/reproducibility/) for image digests and
+the full list of artifacts.
+
+## Authors
+
+- João Pimentel, Instituto Superior Técnico, Universidade de Lisboa
+- Rui Valadas, Instituto Superior Técnico, Universidade de Lisboa
+- Tiago Domingues, LastPass
+
+## Citation
+
+If you use Hackergram in your research, please cite it:
+
+```bibtex
+@software{hackergram2026,
+  author  = {Pimentel, João and Valadas, Rui and Domingues, Tiago},
+  title   = {Hackergram: An Open-Source Platform for Classical and LLM-Driven Web Security Experimentation},
+  year    = {2026},
+  version = {1.0},
+  url     = {https://github.com/netexperiments/hackergramlab}
+}
+```
+
+## Disclaimer
+
+This lab is deliberately vulnerable and intended for educational and research purposes only. Do not use it in
+production, and use the experiments only against your own Hackergram instance.
