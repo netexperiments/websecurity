@@ -14,7 +14,7 @@ Users can create an account by registering a username, password, and name. Once 
 - **Settings** - Update your own name, password, picture, and bio
 - **Search** - Search for posts by content or find other users by username
 - **Messages** - Exchange direct messages with other users
-- **AI Features** - AI-assisted post generation and post summarization powered by a locally hosted LLM (Ollama/Mistral)
+- **AI Features** - AI-assisted post generation and post summarization powered by locally hosted LLMs served through Ollama (Llama 2 and Mistral; see [LLM Setup](../llm-setup.md))
 - **Reset** - The `/reset` endpoint restores the application to its initial state, which is useful after attacks that break or corrupt it
 
 ## Default Users

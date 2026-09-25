@@ -1,8 +1,27 @@
 # Lab Setup
 
+!!! danger "Read before deploying"
+    Hackergram is intentionally vulnerable. Deploy it only in an isolated, controlled environment, and never
+    expose it to the public Internet. See [Safety and Ethical Use](../../safety.md) for the full guidance.
+
 The laboratory environment is designed for local deployment on a single host. Hackergram runs as a Python web application, and users interact with it through a standard web browser. Some attacks are launched through auxiliary Python scripts, while others may additionally use an intercepting proxy such as [Burp Suite](https://portswigger.net/burp){:target="_blank"} or [OWASP ZAP](https://www.zaproxy.org/){:target="_blank"} to observe and manipulate HTTP traffic. For the LLM-integrated functionality, [Ollama](https://ollama.com/){:target="_blank"} is installed locally and provides the model-serving interface consumed by Hackergram. In this single-host setup, the application, browser, proxy, and LLM service can communicate through the loopback interface (e.g., `localhost` or `127.0.0.1`) using distinct ports, which simplifies deployment and improves reproducibility in a controlled experimental environment.
 
-The source code for Hackergram, along with the attack scripts used in the experiments, is available on [GitHub](https://github.com/netexperiments/websecurity){:target="_blank"}.
+The source code for Hackergram is available on GitHub at [netexperiments/hackergramlab](https://github.com/netexperiments/hackergramlab){:target="_blank"}; the attack scripts used in the experiments are included on each attack page of this site.
+
+## Choosing a deployment
+
+| Deployment | Docker image(s) | Classical attacks | LLM attacks | GNS3 | Recommended use |
+|---|---|---|---|---|---|
+| Simple | `pimz23/hackergram-simple:latest` | Yes¹ | No | No | Fastest introduction |
+| Full | `pimz23/hackergram30:latest` | Yes | Yes | No | Complete single-host experimentation |
+| GNS3 | `pimz23/hackergram30:latest`, `pimz23/my-gns3-attacker:1.5`, `pimz23/zap-desktop-novnc:latest`, `gns3/webterm:latest` | Yes | Yes | Yes | Networked experiments |
+
+¹ The simple image has no Ollama and none of the LLM endpoints (`/leaderboard`, `/ai_summarize`,
+`/generate_post`, `/chatlog`), so any exercise that relies on those endpoints needs the full image.
+
+In the GNS3 deployment, Ollama and both models run inside the Hackergram container (the same
+`pimz23/hackergram30` image), so the LLM experiments work there too. To get started quickly with either
+single-host option, follow the [Quick Start](../../quickstart.md).
 
 ## Docker Containers
 
@@ -22,7 +41,7 @@ The experiments can also be deployed in [GNS3](https://www.gns3.com/){:target="_
 
 ![Lab topology](lab-setup.png)
 
-To simplify this process, an automation script developed using the GNS3 API and Ansible is available through this website. It configures the GNS3 environment and instantiates the required lab topology automatically, reducing manual setup effort and improving reproducibility.
+To simplify this process, an automation script developed using the GNS3 API is available through this website. It configures the GNS3 environment and instantiates the required lab topology automatically, reducing manual setup effort and improving reproducibility.
 
 ### GNS3 Prerequisites
 
@@ -41,7 +60,7 @@ Before setting up the GNS3 topology, ensure the following components are install
     1. **Add the Hackergram Attacker container:**
        - In GNS3, go to the settings/preferences
        - Navigate to Docker containers section
-       - Add the container: `0xdrogon/hackergram-attacker`
+       - Add the container: `pimz23/my-gns3-attacker:1.5`
 
     2. **Add the Hackergram application container:**
        - In the same Docker containers section
@@ -49,18 +68,18 @@ Before setting up the GNS3 topology, ensure the following components are install
 
     Once both containers are added to GNS3, you can proceed with creating the lab topology using these containers. 
 
-    Ensure that both GNS3 and the GNS3 VM are running, then execute the script `HackergramLabTopology.py` shown below. Replace the GNS3 VM password on line 8 with your own. You can usually find it in the `gns3_server.ini` file located at `C:\Users\YourUser\AppData\Roaming\GNS3\2.2\gns3_server.ini`.
+    Ensure that both GNS3 and the GNS3 VM are running, then execute the script `HackergramLabTopology.py` shown below. Set the `GNS3_PASSWORD` environment variable to your own GNS3 VM password before running it (e.g. `GNS3_PASSWORD=<your-password> python HackergramLabTopology.py`). You can usually find this password in the `gns3_server.ini` file located at `C:\Users\YourUser\AppData\Roaming\GNS3\2.2\gns3_server.ini`.
 
     ```python
 
+    import os
     import requests
     import time
-    import subprocess
 
     # GNS3 Server API Endpoint
     GNS3_SERVER = "http://localhost:3080/v2"
     USERNAME = "admin"
-    PASSWORD = "uhl128OLIQi8gI4BpJC9vsb2sHOXejqsUKsJrVO9nifTXJbB5WmPh5qoTGtqtLUo"
+    PASSWORD = os.environ["GNS3_PASSWORD"]  # set via: GNS3_PASSWORD=<your-password>
     TEMPLATES = None
 
     # GNS3 Authentication
@@ -68,7 +87,12 @@ Before setting up the GNS3 topology, ensure the following components are install
 
     # Project and container settings
     PROJECT_NAME = "gns3_hackergram_lab"
-    DOCKER_IMAGE = "pimz23/hackergram2.3:latest"
+
+    # GNS3 template names (must match the names given when adding each Docker image to GNS3)
+    HACKERGRAM_TEMPLATE = "pimz23-hackergram30"
+    ATTACKER_TEMPLATE = "pimz23-my-gns3-attacker"
+    ZAP_TEMPLATE = "pimz23-zap-desktop-novnc"
+    WEBTERM_TEMPLATE = "webterm"
 
     def get_project_id():
         """Check if a project with the given name exists and return its ID."""
@@ -440,10 +464,10 @@ Before setting up the GNS3 topology, ensure the following components are install
     HOSTNAME=$(hostname)
     case "$HOSTNAME" in
         *hackergram*|*Hackergram*)
-            configure_ip "192.168.0.10"
+            configure_ip "192.168.0.100"
             ;;
         *attacker*|*Attacker*)
-            configure_ip "192.168.0.100"
+            configure_ip "192.168.0.10"
             ;;
         *zap*|*ZAP*|*novnc*)
             configure_ip "192.168.0.20"
@@ -572,13 +596,10 @@ Before setting up the GNS3 topology, ensure the following components are install
 
         # Retrieve template IDs
         print("\n=== Retrieving Template IDs ===")
-        hackergram_template_id = get_template_id("pimz23-hackergram30")  
-        attacker_template_id = get_template_id("pimz23-my-gns3-attacker-2")
-        zap_template_id = get_template_id("pimz23-zap-desktop-novnc")
-        webterm_template_id = (get_template_id("webterm") or 
-                              get_template_id("Webterm") or 
-                              get_template_id("Web Terminal") or
-                              get_template_id("WebTerm"))
+        hackergram_template_id = get_template_id(HACKERGRAM_TEMPLATE)
+        attacker_template_id = get_template_id(ATTACKER_TEMPLATE)
+        zap_template_id = get_template_id(ZAP_TEMPLATE)
+        webterm_template_id = get_template_id(WEBTERM_TEMPLATE)
         
         # Log which templates were found
         if zap_template_id:
@@ -694,8 +715,8 @@ Before setting up the GNS3 topology, ensure the following components are install
             
         # Add IP address notes to the topology
         print("\n=== Adding IP Address Notes ===")
-        add_note(project_id, "192.168.0.10", x=-400, y=150, font_size=12, color="#006600") 
-        add_note(project_id, "192.168.0.100", x=400, y=150, font_size=12, color="#CC0000") 
+        add_note(project_id, "192.168.0.100", x=-400, y=150, font_size=12, color="#006600")
+        add_note(project_id, "192.168.0.10", x=400, y=150, font_size=12, color="#CC0000")
         add_note(project_id, "192.168.0.20", x=-400, y=480, font_size=12, color="#CC6600")  
         add_note(project_id, "192.168.0.50", x=0, y=480, font_size=12, color="#666666")   
 
@@ -724,8 +745,8 @@ Before setting up the GNS3 topology, ensure the following components are install
         print("   Use the docker exec commands shown above")
         print("")
         print("Target IP Addresses:")
-        print("    - Hackergram: 192.168.0.10/24")
-        print("    - Attacker: 192.168.0.100/24") 
+        print("    - Hackergram: 192.168.0.100/24")
+        print("    - Attacker: 192.168.0.10/24")
         print("    - ZAP Desktop: 192.168.0.20/24")
         print("    - WebTerm: 192.168.0.50/24")
         print("="*60)

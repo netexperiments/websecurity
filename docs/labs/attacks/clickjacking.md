@@ -1,24 +1,43 @@
 # Clickjacking
-Clickjacking, or UI redress attack, is a technique in which attackers trick victims into clicking on hidden
-or disguised elements on a web page. This is typically accomplished by overlaying transparent or
-opaque elements on top of legitimate content, tricking users into performing unintended actions. Such
-actions may include inadvertently downloading malware, exposing confidential information, or initiating
-unauthorized transactions, among other security breaches. 
 
-## Attack
-Create a post on behalf of a user without their knowledge by tricking them into clicking a disguised button embedded within a malicious site. This attack exploits the fact that Hackergram web application can be embedded inside an iframe. In this case, the `/create_post` endpoint will be targeted.
+## Objective
 
-To execute the attack, follow these steps:
+This experiment demonstrates that Hackergram can be embedded inside an `<iframe>` on an attacker-controlled
+page, letting the attacker overlay a deceptive UI so that a victim's genuine click actually lands on a hidden
+Hackergram button. In this case, the click creates a post the victim never intended to submit.
 
-1.	Open about:config in the victim’s webterm browser.
+## Affected Hackergram functionality
 
-2.	Search for network.cookie.cookieBehavior and set its value to 0.
+- `/create_post` (POST): the endpoint targeted via the hidden iframe in this walkthrough.
 
-3.	Login as mr_robot on Hackergram and keep the session active.
+## Prerequisites
 
-4.	In the attacker’s `/home` directory, craft a file named `clickjacking.html`. This will be a fake HTML page that embeds Hackergram’s `/create_post` endpoint inside an iframe. You can use the template provided below as a starting point. 
+Simple/local deployment, plus an attacker-controlled HTTP server (`python3 -m http.server`).
 
-    ??? note Clickjacking HTML
+## Initial state
+
+Run `/reset` first, then log in as `mr_robot` in the victim-browser and keep the session active.
+
+## Vulnerable implementation
+
+Hackergram's responses carry no `X-Frame-Options` header and no `frame-ancestors`/`Content-Security-Policy`
+restriction, so nothing stops another site from embedding Hackergram pages in an iframe and layering
+deceptive content on top of them.
+
+## Experiment
+
+Create a post on behalf of a user without their knowledge by tricking them into clicking a disguised button
+embedded within a malicious site. This attack exploits the fact that the Hackergram web application can be
+embedded inside an iframe. In this case, the `/create_post` endpoint will be targeted.
+
+1. Open `about:config` in the victim's webterm browser.
+2. Search for `network.cookie.cookieBehavior` and set its value to `0`.
+3. Login as `mr_robot` on Hackergram and keep the session active.
+4. In the attacker's `/home` directory, craft a file named `clickjacking.html`. This will be a fake HTML page
+   that embeds Hackergram's `/create_post` endpoint inside an iframe. You can use the template provided below
+   as a starting point.
+
+    ??? note "Clickjacking HTML"
 
         ``` html
         <!DOCTYPE html>
@@ -48,8 +67,8 @@ To execute the attack, follow these steps:
                 top: 580px;
                 left: 65%;
                 transform: translateX(-50%);
-                z-index: 10; 
-                pointer-events: none; 
+                z-index: 10;
+                pointer-events: none;
             }
 
             .overlay {
@@ -59,7 +78,7 @@ To execute the attack, follow these steps:
                 width: 100%;
                 height: 100%;
                 z-index: 5;
-                pointer-events: none; 
+                pointer-events: none;
             }
 
         </style>
@@ -73,11 +92,11 @@ To execute the attack, follow these steps:
             window.onload = function() {
                 let iframe = document.querySelector("iframe");
                 let claimButton = document.getElementById("claimButton");
-                
+
                 iframe.addEventListener('load', function() {
                     try {
                         let iframeWindow = iframe.contentWindow;
-                        
+
                         iframeWindow.postMessage({
                             action: 'fillContent',
                             content: 'Hello World!'
@@ -101,27 +120,63 @@ To execute the attack, follow these steps:
         Use the &lt;iframe&gt; tag to embed Hackergram within the malicious site.
     </details>
 
-5.	Run an HTTP server on the attacker using python3 -m http.server 80. Execute this command in the directory used to create the HTML page in the previous step.
-
-6.	In a new tab, visit the attacker’s website by entering `http://<hackergram-ip>/clickjacking.html`, replacing `<hackergram-ip>` with the correct host IP for your lab setup.
-
-7.	Click the “Claim Your Prize” button.
-
-8.	Confirm that the attack succeeded by checking if a new post appears under mr_robot's account in Hackergram.
+5. Run an HTTP server on the attacker using `python3 -m http.server 80`. Execute this command in the
+   directory used to create the HTML page in the previous step.
+6. In a new tab, visit the attacker's website by entering `http://<hackergram-ip>/clickjacking.html`,
+   replacing `<hackergram-ip>` with the correct host IP for your lab setup.
+7. Click the "Claim Your Prize" button.
+8. Confirm that the attack succeeded by checking if a new post appears under `mr_robot`'s account in
+   Hackergram.
 
 !!! note "Additional exercise"
-    Try creating your own attack variation using another Hackergram endpoint. For instance, what if the iframe embeds a friend request action instead of a post?
+    Try creating your own attack variation using another Hackergram endpoint. For instance, what if the
+    iframe embeds a friend request action instead of a post?
 
-## Countermeasure
-To defend against clickjacking, Hackergram must prevent its pages from being embedded into other websites. This requires modifying files inside the Hackergram container. There are two main approaches: 
+## Expected result
 
-1.	In the base.html, add the CSP directive: 
+A new post appears under `mr_robot`'s account, even though `mr_robot` only intended to click a "Claim Your
+Prize" button on what looked like a prize page.
 
-``` html
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self';"> 
-```
+## Why it works
 
-2. In the hackergram.py file, apply the X-Frame-Options header to the desired responses by adding the following line to the returned response object: 
+Without `X-Frame-Options` or a `frame-ancestors` CSP directive, browsers happily render Hackergram inside an
+iframe on any origin. The attacker page positions a transparent overlay over the real, framed
+"submit"/"create post" control, so the victim's click lands on Hackergram's UI element instead of the fake
+button they can see.
 
-```response.headers['X-Frame-Options'] = 'DENY' ```
+## Reset / cleanup
+
+Run `/reset` to remove the forged post.
+
+## Inspect and modify
+
+To defend against clickjacking, Hackergram must prevent its pages from being embedded into other websites.
+This requires modifying files inside the Hackergram container. There are two main approaches:
+
+1. In `base.html`, add the CSP directive:
+
+    ``` html
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self';">
+    ```
+
+2. In `hackergram.py`, apply the `X-Frame-Options` header to the desired responses by adding the following
+   line to the returned response object:
+
+    ```response.headers['X-Frame-Options'] = 'DENY' ```
+
 Now, repeat the attack and verify that the clickjacking attempt is no longer effective.
+
+## Exercise
+
+Build a variation of this attack using a different Hackergram endpoint — for instance, what if the iframe
+embeds a friend-request action instead of a post?
+
+## Hint
+
+<details>
+<summary>💡 Hint</summary>
+
+Any state-changing GET or POST endpoint reachable while logged in is a candidate — friend-request
+accept/decline links are often simple GET requests, which makes the overlay even easier to build.
+
+</details>

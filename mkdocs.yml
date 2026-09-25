@@ -1,10 +1,15 @@
 site_name: Hackergram Lab
 site_url: https://netexperiments.github.io/websecurity/
+repo_url: https://github.com/netexperiments/hackergramlab
+repo_name: netexperiments/hackergramlab
+edit_uri: ""
 
 theme:
   name: material
   favicon: assets/favicon.jpg
   logo: assets/favicon.jpg
+  icon:
+    repo: fontawesome/brands/github
   palette:
     scheme: slate  
   features:
@@ -16,8 +21,11 @@ theme:
     - navigation.tabs.sticky
 nav:
   - Hackergram Overview: labs/hackergram.md
-  - Laboratory Setup: 
+  - Architecture: architecture.md
+  - Laboratory Setup:
+    - Quick Start: quickstart.md
     - Lab Setup: labs/attacks/lab-setup.md
+    - LLM Setup: llm-setup.md
   - Web Security Experiments:
     - Web Security Attacks:
       - Parser-Driven Injections:
@@ -36,6 +44,12 @@ nav:
         - Cross-Site Request Forgery (CSRF): labs/attacks/csrf.md
         - Clickjacking: labs/attacks/clickjacking.md
         - Server-Side Request Forgery (SSRF): labs/attacks/ssrf.md
+  - Reproducibility: reproducibility.md
+  - Extending Hackergram: extending.md
+  - Safety and Ethical Use: safety.md
+  - Software Release, License and Citation: release.md
+extra_css:
+  - css/home.css
 markdown_extensions:
   - admonition
   - pymdownx.details

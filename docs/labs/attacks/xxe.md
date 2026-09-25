@@ -1,6 +1,30 @@
 # XXE Injection
 
-XXE injection occurs when an application processes attacker-controlled XML using a parser that permits external entity resolution. XML allows documents to declare custom entities through a `<!DOCTYPE>` definition, and these entities may reference local files, remote resources, or recursively defined structures. When a parser expands such entities, it treats attacker-supplied directives as part of the document's structure, enabling outcomes that range from information disclosure to denial of service.
+## Objective
+
+This experiment demonstrates that Hackergram's XML parser on the `/posts` endpoint resolves external
+entities, letting an attacker read arbitrary files off the server (`file://` entity) or exhaust its resources
+with a recursively expanding entity ("Billion Laughs"), purely through a crafted XML post body.
+
+## Affected Hackergram functionality
+
+- `/posts` (POST, XML content type): accepts structured API-style XML submissions in addition to normal
+  form data.
+
+## Prerequisites
+
+Simple/local deployment. Both sub-attacks are delivered via a Python script run from the attacker machine.
+
+## Initial state
+
+Run `/reset` first, then register and log in as a throwaway user (the scripts do this automatically).
+
+## Vulnerable implementation
+
+XML support was added to `/posts` to accommodate structured API-style requests alongside normal form
+submissions. While the framework handles form data automatically, the XML path required explicit parsing,
+and the parser was left in a permissive configuration that allows external entity resolution and `DOCTYPE`
+processing, which is the classic precondition for XXE.
 
 A typical malicious payload embeds a `<!DOCTYPE>` declaration that defines an external entity:
 
@@ -11,17 +35,16 @@ A typical malicious payload embeds a `<!DOCTYPE>` declaration that defines an ex
 <foo>&xxe;</foo>
 ```
 
-If the parser resolves the entity `&xxe;`, the referenced file is incorporated into the parsed document and may then be exposed through the application's response. More complex payloads exploit the parser's ability to expand nested entities, causing exponential growth during parsing and overwhelming system resources. These behaviors illustrate that XXE attacks do not rely on application-level logic but on the XML parser's willingness to interpret attacker-controlled structure.
+If the parser resolves `&xxe;`, the referenced file is incorporated into the parsed document and can be
+exposed through the application's response.
 
-## Hackergram Implementation
+## Experiment
 
-In Hackergram, XML support was added to the `/posts` endpoint to accommodate both traditional form submissions and structured API-style requests. While the framework automatically handles form data, XML submissions required explicit parsing, and the selected parser was left in a permissive configuration that allowed external entity resolution. This makes the endpoint a direct example of how parser-driven vulnerabilities arise when attacker-controlled structure is forwarded to a backend parser.
+### File retrieval attack
 
-### File Retrieval Attack
-
-This attack targets the parser's handling of external entities. The attacker submits a crafted XML document to the `/posts` endpoint containing a `<!DOCTYPE>` declaration that defines an external entity referencing the system file `/etc/passwd`. Within the XML body, this entity is expanded, causing the parser to read the referenced file and incorporate its contents into the parsed output. The script then extracts the leaked data from the server's response and prints it to the console.
-
-Run the following script at the attacker's machine:
+The attacker submits a crafted XML document to `/posts` containing a `<!DOCTYPE>` declaration that defines an
+external entity referencing `/etc/passwd`. The parser expands the entity, reading the file and incorporating
+its contents into the parsed output; the script then extracts the leaked data from the response.
 
 ??? note "File Retrieval Attack Script"
 
@@ -75,11 +98,10 @@ Run the following script at the attacker's machine:
             exploit(s)
     ```
 
-Executing the exploit causes the parser to retrieve and expand the referenced file, resulting in disclosure of its contents in the server's response.
+### Billion Laughs denial of service
 
-### Billion Laughs Denial of Service
-
-This attack exploits the parser's handling of recursively defined XML entities. The attacker submits an XML payload containing a chain of nested entities, each expanding into a progressively larger value:
+This attack exploits the parser's handling of recursively defined XML entities. The attacker submits an XML
+payload containing a chain of nested entities, each expanding into a progressively larger value:
 
 ```xml
 <!DOCTYPE lolz [
@@ -92,8 +114,6 @@ This attack exploits the parser's handling of recursively defined XML entities. 
   <query>&lol9;</query>
 </root>
 ```
-
-Run the following script at the attacker's machine:
 
 ??? note "Billion Laughs Denial of Service Script"
 
@@ -160,11 +180,36 @@ Run the following script at the attacker's machine:
             exploit(s)
     ```
 
-When this payload is submitted to the `/posts` endpoint, the XML parser attempts to resolve `&lol9;`, which depends on all preceding entities. This causes exponential expansion during parsing, rapidly consuming memory and CPU resources. As the expansion grows, the application becomes unresponsive and the server eventually terminates the process due to resource exhaustion. Subsequent requests fail because the service is unavailable, illustrating how parser-level entity expansion can be turned into a denial-of-service condition.
+## Expected result
 
-## Countermeasures
+- File retrieval: the server's response includes the contents of `/etc/passwd`.
+- Billion Laughs: as the parser attempts to resolve `&lol9;` (which depends on all preceding entities),
+  memory/CPU usage on the server spikes, the application becomes unresponsive, and the request eventually
+  times out or the connection fails. Subsequent requests fail while the service recovers.
 
-XXE vulnerabilities are eliminated by configuring the XML parser to disallow external entity resolution and `DOCTYPE` declarations entirely. In Python's `lxml` library this is done by passing a restricted `XMLParser`:
+## Why it works
+
+XXE attacks don't rely on application-level logic, only on the XML parser's willingness to interpret
+attacker-controlled structure. Because the parser used for `/posts`' XML path is left in its default
+permissive configuration, `<!DOCTYPE>` declarations and the entities they define are processed rather than
+rejected, so `&xxe;` gets expanded into file contents, and `&lol9;` gets expanded into an exponentially
+large string.
+
+!!! note "Broader context"
+
+    SQL injection, NoSQL injection, and XXE are all parser-driven attacks: they arise when attacker-controlled
+    input is incorporated into a structured construct before parsing, allowing the attacker to alter query
+    logic, introduce operators, or trigger entity resolution.
+
+## Reset / cleanup
+
+Run `/reset` to restore Hackergram to a clean state (important after the Billion Laughs attack, which may
+leave the application unresponsive until it recovers or is restarted).
+
+## Inspect and modify
+
+XXE is eliminated by configuring the XML parser to disallow external entity resolution and `DOCTYPE`
+declarations entirely. In Python's `lxml`, pass a restricted `XMLParser`:
 
 ```py
 from lxml import etree
@@ -177,8 +222,23 @@ parser = etree.XMLParser(
 tree = etree.fromstring(xml_data, parser)
 ```
 
-With `resolve_entities=False` the parser treats entity references as plain text instead of expanding them, neutralising both file retrieval and Billion Laughs payloads. `no_network=True` prevents the parser from issuing outbound requests for remote entities, and `load_dtd=False` blocks `DOCTYPE` declarations from being processed at all.
+`resolve_entities=False` makes the parser treat entity references as plain text instead of expanding them,
+neutralizing both the file-retrieval and Billion Laughs payloads. `no_network=True` prevents the parser from
+issuing outbound requests for remote entities, and `load_dtd=False` blocks `DOCTYPE` declarations from being
+processed at all. Apply this to the `/posts` XML-parsing path, repeat both attacks, and confirm the entity is
+no longer expanded.
 
-!!! note "Broader context"
+## Exercise
 
-    SQL injection, NoSQL injection, and XXE are all parser-driven attacks: they arise when attacker-controlled input is incorporated into a structured construct before parsing, allowing the attacker to alter query logic, introduce operators, or trigger entity resolution. 
+Modify the file-retrieval script to target a different sensitive file on the Hackergram host (for example,
+the application's own source file) instead of `/etc/passwd`.
+
+## Hint
+
+<details>
+<summary>💡 Hint</summary>
+
+Any file the application process can read is fair game, so try the app's own entry point, or a configuration
+file that might contain database credentials.
+
+</details>

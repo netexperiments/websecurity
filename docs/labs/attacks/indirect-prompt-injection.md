@@ -1,23 +1,59 @@
 # Indirect Prompt Injection
 
-Indirect prompt injection is an attack in which an adversary places hidden instructions in an external content source, such as a webpage, document, or API response, that is later fetched and processed by a language model integrated into a backend application. The vulnerability arises when externally retrieved content is incorporated into an LLM workflow without a strict separation between untrusted data and privileged instructions. Rather than interacting with the model directly, the attacker relies on the application to retrieve poisoned content during an otherwise legitimate task and forward it to the LLM service.
+**Flow:** `attacker webpage → Hackergram retrieval → LLM context → attacker-influenced output`
 
-### Attack flow
+## Objective
+
+Indirect prompt injection is an attack in which an adversary places hidden instructions in an external
+content source, such as a webpage, that is later fetched and processed by a language model integrated into a
+backend application. The vulnerability arises when externally retrieved content is incorporated into an LLM
+workflow without a strict separation between untrusted data and privileged instructions. Rather than
+interacting with the model directly, the attacker relies on the application to retrieve poisoned content
+during an otherwise legitimate task and forward it to the LLM service. This experiment demonstrates that
+Hackergram's AI-assisted post generation does exactly this: it fetches an attacker-supplied URL and pastes the
+raw page content into the model's prompt with no boundary between data and instructions.
 
 Indirect prompt injection unfolds through six main steps:
 
-1. **The attacker publishes poisoned content.** The attacker hosts external content containing hidden instructions intended to influence the LLM service. This content may appear benign while embedding directives that steer the model toward attacker-chosen behavior.
-2. **The user submits a retrieval prompt.** A legitimate user submits a prompt that triggers an LLM-mediated task requiring external content retrieval. In some deployments, this step may also be initiated automatically by the backend application rather than explicitly by the user.
-3. **The backend application fetches poisoned content.** As part of the requested workflow, the backend application retrieves content from the attacker-controlled server. Because the resource is treated as ordinary external input, the hidden instructions are ingested without being isolated from the rest of the content.
-4. **The backend application sends the content to the LLM service.** The backend application forwards the retrieved content, together with the retrieval context or user request, to the LLM service for processing. Since no strict boundary is enforced between data and instructions, the embedded directives become part of the model's effective input.
-5. **The LLM service returns attacker-influenced output.** When processing the combined input, the LLM service follows the hidden instructions in the poisoned content and produces output aligned with the attacker's intent rather than solely with the user's request.
-6. **The backend application delivers attacker-influenced output.** The backend application returns the resulting output to the user, completing the indirect prompt injection attack.
+1. **The attacker publishes poisoned content.** The attacker hosts external content containing hidden
+   instructions intended to influence the LLM service. This content may appear benign while embedding
+   directives that steer the model toward attacker-chosen behavior.
+2. **The user submits a retrieval prompt.** A legitimate user submits a prompt that triggers an LLM-mediated
+   task requiring external content retrieval. In some deployments, this step may also be initiated
+   automatically by the backend application rather than explicitly by the user.
+3. **The backend application fetches poisoned content.** As part of the requested workflow, the backend
+   application retrieves content from the attacker-controlled server. Because the resource is treated as
+   ordinary external input, the hidden instructions are ingested without being isolated from the rest of the
+   content.
+4. **The backend application sends the content to the LLM service.** The backend application forwards the
+   retrieved content, together with the retrieval context or user request, to the LLM service for processing.
+   Since no strict boundary is enforced between data and instructions, the embedded directives become part of
+   the model's effective input.
+5. **The LLM service returns attacker-influenced output.** When processing the combined input, the LLM
+   service follows the hidden instructions in the poisoned content and produces output aligned with the
+   attacker's intent rather than solely with the user's request.
+6. **The backend application delivers attacker-influenced output.** The backend application returns the
+   resulting output to the user, completing the indirect prompt injection attack.
 
-## Attack
+## Affected Hackergram functionality
 
-Hackergram includes an AI-assisted post creation feature exposed through the `/generate_post` endpoint. This endpoint allows users to provide an external URL as part of their prompt; the backend fetches that URL's content and forwards it to the LLM (Mistral, via Ollama) to generate a social-media post.
+- `/generate_post`: AI-assisted post creation. This endpoint allows users to provide an external URL as part
+  of their prompt; the backend fetches that URL's content and forwards it to the LLM (Mistral, via Ollama) to
+  generate a social-media post.
 
-The relevant code in `views.py` works as follows:
+## Prerequisites
+
+Full deployment with the `mistral` model pulled in Ollama (see [LLM Setup](../../llm-setup.md)), plus an attacker-controlled HTTP server (`python3 -m http.server`)
+to host the poisoned page.
+
+## Initial state
+
+Log in to Hackergram on the victim browser (no `/reset` strictly required, since nothing is stored beyond
+the generated post).
+
+## Vulnerable implementation
+
+The relevant code in `views.py`:
 
 ??? note "Vulnerable Endpoint Code"
 
@@ -45,11 +81,14 @@ The relevant code in `views.py` works as follows:
     response = http_requests.post(url=OLLAMA_API_URL, json=payload)
     ```
 
-The fetched webpage content is concatenated directly into the prompt with no sanitization or boundary between the external data and the model instructions. An attacker can exploit this to steer the model toward harmful or unintended output.
+The fetched webpage content is concatenated directly into the prompt with no sanitization or boundary between
+the external data and the model instructions. An attacker can exploit this to steer the model toward harmful
+or unintended output.
 
-To perform the attack, follow these steps:
+## Experiment
 
-1. On the **attacker machine**, create a malicious HTML page (e.g. `/home/index.html`) containing a hidden instruction:
+1. On the **attacker machine**, create a malicious HTML page (e.g. `/home/index.html`) containing a hidden
+   instruction:
 
     ```html
     <html>
@@ -69,11 +108,8 @@ To perform the attack, follow these steps:
     ```
 
 3. Log in to Hackergram on the victim browser.
-
 4. Navigate to the post-creation page (`/create_post`).
-
 5. Click the **"Generate with AI"** button.
-
 6. When prompted for a topic, provide the attacker-controlled URL:
 
     ```
@@ -82,22 +118,43 @@ To perform the attack, follow these steps:
 
     Replace `<attacker-ip>` with the attacker machine's IP address.
 
-7. Observe the generated output. Instead of producing a benign post based on the page's visible content, the model follows the embedded malicious instructions and generates unintended output controlled by the attacker.
-
-8. Confirm the attack by checking that the resulting post reflects the attacker's injected instructions rather than legitimate content.
-
-!!! note "Why it works"
-    The `/generate_post` endpoint fetches the external page with `http_requests.get(url)` and pastes the first 1000 characters directly into the prompt string (`f"Content from URL:\n{fetched_content}\n\n..."`). No boundary separates the fetched data from the model's instruction context. The LLM treats the hidden directive as part of its instructions and follows it, producing attacker-controlled output that Hackergram then displays as a normal generated post.
+7. Observe the generated output. Instead of producing a benign post based on the page's visible content, the
+   model follows the embedded malicious instructions and generates unintended output controlled by the
+   attacker.
+8. Confirm the attack by checking that the resulting post reflects the attacker's injected instructions
+   rather than legitimate content.
 
 !!! note "Additional exercise"
-    Try different hiding techniques for the poisoned instructions: HTML comments, invisible `<span>` tags with `display:none`, white text on a white background, or instructions embedded inside JSON/XML metadata. Observe which approaches are most effective at bypassing the model's tendency to ignore non-visible content.
+    Try different hiding techniques for the poisoned instructions: HTML comments, invisible `<span>` tags
+    with `display:none`, white text on a white background, or instructions embedded inside JSON/XML
+    metadata. Observe which approaches are most effective at bypassing the model's tendency to ignore
+    non-visible content.
 
-## Countermeasure
+## Expected result
 
-To mitigate indirect prompt injection in Hackergram, the `/generate_post` endpoint must enforce a strict separation between externally sourced content and the model's instruction channel. The main strategies are:
+The generated post reads "HACKED - This post was generated by an attacker through indirect prompt
+injection." (or similar attacker-controlled text) instead of a benign summary of the page's visible content. This confirms that hidden instructions in fetched content reached and steered the model.
 
-**1. Clearly delimit fetched content as untrusted data.**
-Wrap external content in explicit boundaries and instruct the model to treat it only as reference material, never as instructions. Use the chat API (`/api/chat`) with role separation:
+## Why it works
+
+The `/generate_post` endpoint fetches the external page with `http_requests.get(url)` and pastes the first
+1000 characters directly into the prompt string (`f"Content from URL:\n{fetched_content}\n\n..."`). No
+boundary separates the fetched data from the model's instruction context. The LLM treats the hidden directive
+as part of its instructions and follows it, producing attacker-controlled output that Hackergram then
+displays as a normal generated post.
+
+## Reset / cleanup
+
+Run `/reset` to remove any generated post created during the experiment.
+
+## Inspect and modify
+
+To mitigate indirect prompt injection in Hackergram, the `/generate_post` endpoint must enforce a strict
+separation between externally sourced content and the model's instruction channel. The main strategies are:
+
+**1. Clearly delimit fetched content as untrusted data.** Wrap external content in explicit boundaries and
+instruct the model to treat it only as reference material, never as instructions. Use the chat API
+(`/api/chat`) with role separation:
 
 ??? note "Secure Prompt Implementation"
 
@@ -125,8 +182,8 @@ Wrap external content in explicit boundaries and instruct the model to treat it 
     }
     ```
 
-**2. Sanitize fetched content before including it in the prompt.**
-Strip HTML tags, comments, and invisible elements from the fetched page. Only pass plain visible text to the model:
+**2. Sanitize fetched content before including it in the prompt.** Strip HTML tags, comments, and invisible
+elements from the fetched page. Only pass plain visible text to the model:
 
 ```python
 from bs4 import BeautifulSoup
@@ -141,10 +198,30 @@ for comment in soup.find_all(string=lambda t: isinstance(t, Comment)):
 clean_text = soup.get_text(separator=' ', strip=True)
 ```
 
-**3. Limit what the model can do with external content.**
-Restrict the fetched content length, reject responses that deviate significantly from the expected output format (e.g., a social-media post), and post-process the model's output before returning it.
+**3. Limit what the model can do with external content.** Restrict the fetched content length, reject
+responses that deviate significantly from the expected output format (e.g., a social-media post), and
+post-process the model's output before returning it.
 
-**4. Validate and restrict allowed URLs.**
-Maintain an allowlist of trusted domains, or at minimum block internal/private IP ranges to prevent the endpoint from being used for both indirect prompt injection and SSRF.
+**4. Validate and restrict allowed URLs.** Maintain an allowlist of trusted domains, or at minimum block
+internal/private IP ranges to prevent the endpoint from being used for both indirect prompt injection and
+SSRF.
 
-Now, repeat the attack and verify that the poisoned webpage content no longer influences the generated post.
+Apply these fixes, repeat the attack, and verify that the poisoned webpage content no longer influences the
+generated post.
+
+## Exercise
+
+Try different hiding techniques for the poisoned instructions: HTML comments, invisible `<span>` tags with
+`display:none`, white text on a white background, or instructions embedded inside JSON/XML metadata. Observe
+which approaches are most effective at bypassing the model's tendency to ignore non-visible content.
+
+## Hint
+
+<details>
+<summary>💡 Hint</summary>
+
+Models trained to be helpful often follow the *last* clear instruction in their context, so placing your
+directive at the very end of the fetched page, after the visible content, can make it more likely to be
+followed than embedding it earlier.
+
+</details>

