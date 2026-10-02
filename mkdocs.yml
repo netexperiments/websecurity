@@ -6,7 +6,7 @@ edit_uri: ""
 copyright: >
   Copyright &copy; 2026 João Pimentel, Rui Valadas ·
   Hackergram is released under the
-  <a href="https://github.com/netexperiments/hackergramlab/blob/v1.0/LICENSE">MIT License</a>
+  <a href="https://github.com/netexperiments/hackergramlab/blob/v1.0/LICENSE">Apache License 2.0</a>
 
 theme:
   name: material

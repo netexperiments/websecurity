@@ -6,7 +6,7 @@
 |---|---|
 | **Hackergram version** | v1.0, the version described in the accompanying Computer Networks article |
 | **Release date** | 1 Apr 2026 |
-| **License** | [MIT License](https://github.com/netexperiments/hackergramlab/blob/v1.0/LICENSE){:target="_blank"} |
+| **License** | [Apache License 2.0](https://github.com/netexperiments/hackergramlab/blob/v1.0/LICENSE){:target="_blank"} |
 | **Release / tag** | [v1.0](https://github.com/netexperiments/hackergramlab/releases/tag/v1.0){:target="_blank"} |
 | **DOI (Zenodo)** | [10.5281/zenodo.22966304](https://doi.org/10.5281/zenodo.22966304){:target="_blank"} |
 | **Source repository** | [netexperiments/hackergramlab](https://github.com/netexperiments/hackergramlab){:target="_blank"} (application code). This companion site lives separately in [netexperiments/websecurity](https://github.com/netexperiments/websecurity){:target="_blank"}. |

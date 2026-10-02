@@ -69,13 +69,3 @@ See [LLM Setup](llm-setup.md) for installation details.
 !!! note "Test environment"
     These versions come from the WSL test installation. The distributed Docker images are built on
     Ubuntu 20.04, so package versions inside the containers may differ.
-
-## Reproduce the paper examples
-
-_These links will be finalized once the paper's section numbers are stable._
-
-| Paper section | Experiment |
-|---|---|
-| _Section TBD_: XSS worm | [Run this experiment](labs/attacks/xss.md#xss-worm) |
-| _Section TBD_: LLM-mediated SQL injection | [Run this experiment](labs/attacks/llm-mediated-sqli.md) |
-| _Section TBD_: GNS3 deployment | [Build this topology](labs/attacks/lab-setup.md#gns3-deployment) |
