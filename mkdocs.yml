@@ -3,6 +3,10 @@ site_url: https://netexperiments.github.io/websecurity/
 repo_url: https://github.com/netexperiments/hackergramlab
 repo_name: netexperiments/hackergramlab
 edit_uri: ""
+copyright: >
+  Copyright &copy; 2026 João Pimentel, Rui Valadas ·
+  Hackergram is released under the
+  <a href="https://github.com/netexperiments/hackergramlab/blob/v1.0/LICENSE">MIT License</a>
 
 theme:
   name: material
