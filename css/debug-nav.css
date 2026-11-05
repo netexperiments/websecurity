@@ -1,0 +1,62 @@
+/* Debug CSS to make navigation.path visible */
+
+/* Make the navigation path breadcrumb highly visible */
+.md-nav__path {
+  background: red !important;
+  color: white !important;
+  padding: 10px !important;
+  margin: 10px 0 !important;
+  display: block !important;
+  visibility: visible !important;
+  font-size: 16px !important;
+  font-weight: bold !important;
+  border: 2px solid yellow !important;
+  opacity: 1 !important;
+  z-index: 9999 !important;
+  position: relative !important;
+}
+
+/* Alternative selectors in case the class name is different */
+.md-path,
+.md-breadcrumb,
+.md-nav__breadcrumb,
+[data-md-component="path"],
+.md-nav--primary .md-nav__path {
+  background: blue !important;
+  color: white !important;
+  padding: 10px !important;
+  margin: 10px 0 !important;
+  display: block !important;
+  visibility: visible !important;
+  font-size: 16px !important;
+  font-weight: bold !important;
+  border: 2px solid green !important;
+}
+
+/* Debug: Show all navigation elements */
+[class*="nav"] {
+  outline: 1px solid orange !important;
+}
+
+/* Debug: Add content to show if element exists but is empty */
+.md-nav__path:empty::before {
+  content: "NAVIGATION PATH ELEMENT FOUND BUT EMPTY" !important;
+  background: purple !important;
+  color: white !important;
+  display: block !important;
+  padding: 5px !important;
+}
+
+/* Make sure the container shows the path */
+.md-main__inner {
+  position: relative !important;
+}
+
+/* Debug any path-related classes that might exist */
+[class*="path"]::before {
+  content: "PATH ELEMENT: " attr(class) !important;
+  background: pink !important;
+  color: black !important;
+  display: block !important;
+  font-size: 12px !important;
+} 
